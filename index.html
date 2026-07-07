@@ -732,14 +732,20 @@ HASILKAN (Markdown):
 [Lighting setiap scene]
 
 ## AUDIO
-[Sound design]
+[Sound design — bgm, ambient, sfx]
+
+## TEXT OVERLAY / SUBTITLE (PENTING!)
+[UNTUK SETIAP SCENE: specify teks subtitle yang MESTI muncul di skrin. Format: "TEKS" | posisi (bottom-center) | timing (0.5s fade in, hold 2s) | font style (white, bold, shadow). AI video tools TAKDE VOICE — dialogue MESTI jadi on-screen text overlay supaya penonton boleh baca.]
 
 ## SCENE BREAKDOWN
-[Setiap scene: Camera, Action, Emotion, Dialogue, Transition — DETAIL]
+[Setiap scene: Camera, Action, Emotion, VISUAL TEXT OVERLAY, Transition — DETAIL. Pastikan ada subtitle untuk setiap dialog.]
 
 ## ENDING + TRANSITION CONTINUITY
 
-GUNA BAHASA MALAYSIA. Dialogue natural.`;
+## POST-PRODUCTION NOTE
+[Dialogue perlu ditambah sebagai voiceover guna ElevenLabs/TTS selepas video siap. Teks subtitle dalam video = placeholder sampai voiceover ditambah.]
+
+GUNA BAHASA MALAYSIA. Dialogue natural. SUBTITLE WAJIB.`;
 
   const response = await callGemini(prompt);
   currentVideoPrompt = response;
