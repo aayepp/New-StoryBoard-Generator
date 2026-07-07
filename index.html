@@ -703,7 +703,7 @@ PERATURAN KRITIKAL:
             <strong style="color:var(--gold);">💬 DIALOG:</strong> <em style="color:#eee;">"${escapeHtml(s.dialogue)}"</em>
           </div>` : ''}
       </div>
-      ${sb.characters ? `<div style="position:absolute;bottom:0.35rem;right:0.4rem;font-size:0.55rem;color:var(--text2);z-index:1;">👤 ${escapeHtml(sb.characters.split('.')[0] || '')}</div>` : ''}
+      ${sb.characters ? `<div style="position:absolute;bottom:0.35rem;right:0.4rem;font-size:0.55rem;color:var(--text2);z-index:1;">👤 ${escapeHtml(String(sb.characters).split('.')[0] || '')}</div>` : ''}
     </div>`;
   });
   html += `</div>`;
@@ -713,7 +713,7 @@ PERATURAN KRITIKAL:
     <span>⏱️ ${escapeHtml(sb.duration || '10 SAAT')}</span>
     <span>📐 ${escapeHtml(sb.format || 'VERTICAL 9:16')}</span>
     <span>🎬 ${sb.scenes?.length || 4} SCENE</span>
-    ${sb.characters ? `<span>👤 ${escapeHtml(sb.characters.substring(0,60))}</span>` : ''}
+    ${sb.characters ? `<span>👤 ${escapeHtml(String(sb.characters).substring(0,60))}</span>` : ''}
     <span>🎨 ${escapeHtml((sb.style || '').substring(0,40))}</span>
   </div>`;
 
