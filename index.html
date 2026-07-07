@@ -1045,6 +1045,7 @@ function copyPanelPrompts(){const p=window._panelPrompts;if(!p?.length)return;na
 
 // ═══════════════════ UTILS ═══════════════════
 function escapeHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function escapeAttr(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function showToast(m,e){const t=document.getElementById('toast');t.textContent=m;t.style.background=e?'var(--red)':'var(--green)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 // ═══════════════════ AUDIO TTS ═══════════════════
