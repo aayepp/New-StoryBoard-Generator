@@ -731,21 +731,27 @@ HASILKAN (Markdown):
 ## LIGHTING
 [Lighting setiap scene]
 
-## AUDIO
-[Sound design — bgm, ambient, sfx]
+## SCENE BREAKDOWN — DIALOGUE & SPEAKING ACTION (WAJIB!)
+[UNTUK SETIAP SCENE, describe watak SEDANG BERCAKAP / SPEAKING:
+- "Character is SPEAKING the dialogue: '[teks penuh]'"
+- Describe mouth movement: "lips moving, speaking expressively"
+- Describe facial expression matching the dialogue emotion
+- If two characters: "Character A speaks while Character B reacts"
+- Camera: Close-up on speaking character's face, focus on lips
+- Pastikan ada VISIBLE SPEAKING ACTION dalam setiap scene yang ada dialogue
 
-## TEXT OVERLAY / SUBTITLE (PENTING!)
-[UNTUK SETIAP SCENE: specify teks subtitle yang MESTI muncul di skrin. Format: "TEKS" | posisi (bottom-center) | timing (0.5s fade in, hold 2s) | font style (white, bold, shadow). AI video tools TAKDE VOICE — dialogue MESTI jadi on-screen text overlay supaya penonton boleh baca.]
-
-## SCENE BREAKDOWN
-[Setiap scene: Camera, Action, Emotion, VISUAL TEXT OVERLAY, Transition — DETAIL. Pastikan ada subtitle untuk setiap dialog.]
+FORMAT setiap scene:
+### Scene X (timestamp)
+- **Visual Action:** [watak buat apa — MESTI include SPEAKING kalau ada dialogue]
+- **Dialogue:** "[teks penuh]" — watak SEDANG BERCAKAP, lips moving
+- **Camera:** [Close-up/Medium shot on speaking character]
+- **Emotion:** [expression masa bercakap]
+- **Transition:** [transition ke scene seterusnya]
+]
 
 ## ENDING + TRANSITION CONTINUITY
 
-## POST-PRODUCTION NOTE
-[Dialogue perlu ditambah sebagai voiceover guna ElevenLabs/TTS selepas video siap. Teks subtitle dalam video = placeholder sampai voiceover ditambah.]
-
-GUNA BAHASA MALAYSIA. Dialogue natural. SUBTITLE WAJIB.`;
+PENTING: Dialogue BUKAN subtitle/text overlay. Dialogue = WATAK SEDANG BERCAKAP dgn mulut bergerak. Describe LIP MOVEMENT, SPEAKING EXPRESSION, MOUTH SHAPE untuk setiap dialogue scene.`;
 
   const response = await callGemini(prompt);
   currentVideoPrompt = response;
@@ -754,6 +760,28 @@ GUNA BAHASA MALAYSIA. Dialogue natural. SUBTITLE WAJIB.`;
   let html = `<div class="ai-header"><span class="ai-icon">🎥</span><span class="ai-title">Production-Ready AI Video Prompt</span></div>`;
   html += `<p style="font-size:0.8rem; color:var(--text2); margin-bottom:0.5rem;">Prompt siap-pakai untuk Runway / Pika / Kling / Sora.</p>`;
   html += `<div class="code-block">${escapeHtml(response)}</div>`;
+
+  // ── AUDIO SECTION ──
+  const dialogues = (sb.scenes || []).filter(s => s.dialogue && s.dialogue !== '[No dialogue]');
+  if (dialogues.length > 0) {
+    html += `<div style="margin-top:1rem; padding:0.75rem; background:var(--surface2); border-radius:var(--radius-sm); border:1px solid var(--border);">
+      <strong style="color:var(--gold);">🔊 Audio Dialog <span style="font-size:0.7rem; color:var(--text2);">(guna untuk voiceover video)</span></strong>
+      <p style="font-size:0.72rem; color:var(--text2); margin:0.3rem 0 0.5rem;">AI video tools tak generate suara. Guna audio di bawah untuk tambah voiceover masa edit.</p>`;
+
+    dialogues.forEach((s, i) => {
+      html += `<div id="audioRow${i}" style="display:flex; align-items:center; gap:0.5rem; margin:0.4rem 0; font-size:0.75rem;">
+        <span style="color:var(--accent); white-space:nowrap; min-width:60px;">Scene ${s.sceneNum}:</span>
+        <span style="flex:1; color:var(--text); font-style:italic; font-size:0.78rem;">"${escapeHtml(s.dialogue.substring(0,60))}${s.dialogue.length>60?'...':''}"</span>
+        <button class="action-btn btn-sm" onclick="generateAudio(${i}, '${escapeAttr(s.dialogue)}')" id="audioBtn${i}" style="font-size:0.7rem; padding:0.3rem 0.6rem;">▶️ Play</button>
+        <button class="action-btn btn-sm" onclick="downloadAudio(${i})" style="font-size:0.7rem; padding:0.3rem 0.6rem; display:none;" id="downloadBtn${i}">⬇️</button>
+      </div>`;
+    });
+
+    html += `<div style="margin-top:0.5rem; font-size:0.68rem; color:var(--text2);">
+      💡 <strong>Cara guna:</strong> 1) Generate video visual guna prompt atas 2) Download audio dialog 3) Gabung dgn CapCut/Canva/Premiere — sync audio ikut timestamp scene
+    </div></div>`;
+  }
+
   html += `<p style="margin-top:0.75rem;"><strong>Pilih satu:</strong></p>
     <div class="choice-row">
       <button class="choice-btn primary" onclick="handleChoice('1')">🖼️ Generate Gambar Storyboard</button>
@@ -776,7 +804,7 @@ async function generateStoryboardImage() {
   const charBlock = `CHARACTER CONSISTENCY (KRITIKAL):\n${characters}\nRULE: Muka, umur, pakaian, hijab/tudung, warna kulit, body proportion MESTI IDENTICAL.`;
 
   const panelPrompts = (sb.scenes || []).map((s, i) => {
-    return `${charBlock}\n\nGENERATE PANEL ${i+1}/4 — SATU frame photorealistic 9:16.\n\nSCENE ${s.sceneNum} (${s.timestamp})\nVISUAL: ${s.visual}\nACTION: ${s.action || ''}\nCAMERA: ${s.camera || ''}\nEMOTION: ${s.emotion || ''}\n\nCRITICAL: Photorealistic 8K, Malaysian setting, NO text/words in image, watak MESTI identical.`;
+    return `${charBlock}\n\nGENERATE PANEL ${i+1}/4 — SATU frame photorealistic 9:16.\n\nSCENE ${s.sceneNum} (${s.timestamp})\nVISUAL: ${s.visual}\nACTION: ${s.action || ''}\nCAMERA: ${s.camera || ''}\nEMOTION: ${s.emotion || ''}\n${s.dialogue && s.dialogue !== '[No dialogue]' ? `SPEAKING ACTION: Character is VISIBLY SPEAKING the dialogue: "${s.dialogue}". Show lips moving, mouth open, speaking expression matching the emotion.` : ''}\n\nCRITICAL: Photorealistic 8K, Malaysian setting, NO text/words in image, watak MESTI identical.${s.dialogue ? ' Character MESTI nampak sedang bercakap — lips moving, mouth shaping words.' : ''}`;
   });
 
   const panelImages = [];
@@ -1018,6 +1046,35 @@ function copyPanelPrompts(){const p=window._panelPrompts;if(!p?.length)return;na
 // ═══════════════════ UTILS ═══════════════════
 function escapeHtml(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function showToast(m,e){const t=document.getElementById('toast');t.textContent=m;t.style.background=e?'var(--red)':'var(--green)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ═══════════════════ AUDIO TTS ═══════════════════
+window._audioBlobs={};
+async function generateAudio(i,text){
+  const btn=document.getElementById('audioBtn'+i),dBtn=document.getElementById('downloadBtn'+i);
+  if(!btn)return;
+  if(window._audioBlobs[i]){playBlob(window._audioBlobs[i],btn);return;}
+  btn.textContent='⏳...';btn.disabled=true;
+  try{
+    const ttsUrl=`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=ms&client=tw-ob`;
+    const res=await fetch(ttsUrl);
+    if(res.ok){
+      const blob=await res.blob();window._audioBlobs[i]=blob;
+      if(dBtn)dBtn.style.display='inline-flex';playBlob(blob,btn);
+    }else{throw new Error('TTS unavailable');}
+    btn.textContent='▶️ Play';btn.disabled=false;
+  }catch(e){
+    // Fallback: browser speech
+    const u=new SpeechSynthesisUtterance(text);u.lang='ms-MY';u.rate=0.95;
+    const voices=speechSynthesis.getVoices();
+    const mv=voices.find(v=>v.lang.startsWith('ms'))||voices.find(v=>v.lang.startsWith('id'));
+    if(mv)u.voice=mv;
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+    btn.textContent='🔊 No DL';btn.disabled=false;
+    showToast('Guna browser speech (tak boleh download). Untuk download, guna ElevenLabs.',false);
+  }
+}
+function playBlob(b,btn){const u=URL.createObjectURL(b);const a=new Audio(u);btn.textContent='⏸️';a.onended=()=>{btn.textContent='▶️ Play';URL.revokeObjectURL(u)};a.onerror=()=>{btn.textContent='▶️ Play'};a.play();}
+function downloadAudio(i){const b=window._audioBlobs[i];if(!b)return showToast('Generate dulu!',true);const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`scene_${i+1}_dialogue.mp3`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);showToast('⬇️ Audio didownload!');}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 </script>
