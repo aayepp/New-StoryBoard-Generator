@@ -616,84 +616,105 @@ function scrollChat() {
 
 // ═══════════════════ STEP 1: STORYBOARD ═══════════════════
 async function generateStoryboard(topic) {
-  const prompt = `Kamu adalah PAKAR STORYBOARD VIDEO PENDEK. Hasilkan storyboard LENGKAP & TERPERINCI.
+  const prompt = `Kamu adalah PAKAR STORYBOARD VIDEO PENDEK bertaraf dunia. Hasilkan storyboard PRODUCTION-READY yang SANGAT DETAIL.
 
 TOPIK: ${topic}
 
-OUTPUT FORMAT (JSON SAHAJA, no markdown):
+OUTPUT FORMAT (JSON SAHAJA):
 {
-  "title": "STORYBOARD: Tajuk catchy",
+  "title": "STORYBOARD: [Tajuk catchy & spesifik]",
   "duration": "10 SAAT",
   "format": "VERTICAL 9:16",
-  "style": "Emotional Cinematic POV + [genre]",
-  "audience": "Target audience spesifik",
-  "audioSuggestion": "Audio suggestion — sound design, music, ambience",
-  "objective": "1-2 ayat objektif utama",
-  "characters": "Deskripsi watak LENGKAP — nama, umur, bangsa, penampilan, pakaian, ekspresi muka. Contoh: 'Ayah (35), Ibu (33), Anak (6) — Keluarga Melayu...'",
+  "style": "Emotional Cinematic POV + [genre spesifik — contoh: Family Drama / Suspense / Motivasi]",
+  "audience": "[Target audience SPESIFIK — umur, jantina, minat, behavior. Contoh: 'Pasangan muda 25-35, ibu bapa baru, aktif media sosial, peduli kesihatan keluarga']",
+  "audioSuggestion": "[Audio DETAIL — bgm, ambient, sfx ikut timeline. Contoh: 'Ambient hospital + Heartbeat (0–5s) / Piano lembut + Strings (5–10s)']",
+  "objective": "[1-2 ayat objektif EMOSIONAL. Bukan functional. Contoh: 'Menyedarkan kepentingan perlindungan kesihatan untuk keluarga tercinta sebelum terlambat']",
+  "characters": "[Deskripsi SETIAP watak LENGKAP — nama, umur, bangsa, warna kulit, rambut, muka, body type, pakaian, aksesori. Contoh: 'Ayah (35) — lelaki Melayu, kulit sawo matang, rambut hitam pendek kemas, janggut tipis, baju kemeja biru gelap, ekspresi letih tapi penyayang. Ibu (33) — perempuan Melayu bertudung pink lembut, muka bulat, mata ekspresif. Anak (6) — lelaki, rambut pendek, baju hospital putih.']",
   "scenes": [
     {
       "sceneNum": 1,
-      "timestamp": "0s-2s (ikut scene — Scene 1: 0-2s, Scene 2: 2-4.5s, Scene 3: 4.5-7s, Scene 4: 7-10s)",
-      "visual": "DESKRIPSI VISUAL DETAIL — setting, lighting, watak, pose, expression, props, warna dominan. Minimum 2 ayat.",
-      "action": "ACTION — apa watak BUAT. Specific actions, gestures, movements.",
-      "emotion": "EMOSI — 2-3 perkataan. Contoh: 'Panik, takut, cemas'",
-      "dialogue": "Dialog natural Bahasa Malaysia. JANGAN skrip iklan.",
-      "camera": "CAMERA — shot type + movement. Contoh: 'Close Up + slow Push In'",
-      "transition": "TRANSITION ke scene seterusnya"
+      "timestamp": "0s–2s",
+      "visual": "[DESKRIPSI PANEL — 3-4 ayat PENUH. Apa NAMPAK dalam frame: setting, lighting, foreground, background, watak, pose, expression muka, props, warna dominan, mood visual.]",
+      "action": "[ACTION — 2-3 ayat. Apa watak BUAT: pergerakan spesifik, gesture tangan, arah pandang, langkah, sentuhan. Gunakan VERBA aktif.]",
+      "emotion": "[EMOSI — 2-3 perkataan diikuti description pendek. Contoh: 'Panik, takut, serba salah — Ayah rasa bersalah tak mampu bayar bil']",
+      "dialogue": "[DIALOG — 1-2 ayat natural Bahasa Malaysia. MESTI ikut emosi scene & karakter. JANGAN generic, JANGAN sales. Contoh: 'Doktor... rawat anak saya dulu. Duit nanti saya cari.']",
+      "camera": "[CAMERA — shot type + angle + movement + focal length. Contoh: 'Over Shoulder + Eye Level + Slow Push In + 35mm lens']",
+      "transition": "[TRANSITION — ke scene seterusnya. Contoh: 'Whip pan ke muka ibu yang datang berlari' atau 'Match cut ke meja makan — flashback 3 bulan']"
     }
   ]
 }
 
-PANDUAN:
-1. 4 SCENE dengan timing: Scene 1 (0-2s Hook), Scene 2 (2-4.5s Konflik), Scene 3 (4.5-7s Realisasi), Scene 4 (7-10s Resolusi). Ending MESTI ada cukup masa — slow fade out, emotional payoff, jangan rush.
-2. Dialog NATURAL & emotional. Bukan sales pitch.
-3. Camera direction SPECIFIC & TECHNICAL.
-4. Scene 4 (ending) kena ada SLOW PACING — wide shot → slow push in → hold 1.5s → fade to black. Biar penonton rasa emotional impact.
-5. Guna BAHASA MALAYSIA untuk semua content.
-6. OUTPUT JSON SAHAJA.`;
+EMOTIONAL ARC WAJIB (ikut timing):
+- Scene 1 (0-2s): HOOK — pain point, masalah, tarik emosi SEGERA
+- Scene 2 (2-4.5s): KONFLIK — desperation, helplessness, emosi puncak
+- Scene 3 (4.5-7s): FLASHBACK/REALISASI — solusi, keputusan, harapan
+- Scene 4 (7-10s): RESOLUSI — happy ending, emotional payoff, slow fade, keluarga selamat
+
+PERATURAN KRITIKAL:
+1. SEMUA field MESTI diisi — jangan skip, jangan letak placeholder
+2. Visual description MINIMUM 3 ayat penuh, DETAIL & SPESIFIK
+3. Action MESTI specific & visual — describe pergerakan yang NAMPAK
+4. Emotion MESTI spesifik — bukan generic "sedih", tapi "sedih bercampur putus asa, mata berkaca"
+5. Dialogue MESTI authentic — macam orang bercakap betul, bukan skrip iklan
+6. Camera SPECIFIC — sebut shot type, angle, movement, focal length
+7. Characters MESTI detail — cukup info untuk AI video generator maintain consistency
+8. Audio ikut emotional arc — tense untuk scene 1-2, lembut untuk 3-4
+9. BAHASA MALAYSIA untuk semua content
+10. OUTPUT JSON SAHAJA — 4 scene tepat`;
 
   const response = await callGemini(prompt);
   currentStoryboard = parseJSON(response);
   removeTyping();
 
   const sb = currentStoryboard;
-  let html = `<div class="ai-header"><span class="ai-icon">📋</span><span class="ai-title">${escapeHtml(sb.title || 'STORYBOARD')}</span></div>`;
+  let html = `<div class="ai-header"><span class="ai-icon">📋</span><span class="ai-title" style="font-size:1rem;">${escapeHtml(sb.title || 'STORYBOARD')}</span></div>`;
 
-  // Header card
-  html += `<div class="storyboard-card" style="border-left:4px solid var(--gold);">
-    <div class="sb-meta">
+  // ═══ HEADER METADATA (macam gambar) ═══
+  html += `<div class="storyboard-card" style="border-left:4px solid var(--gold); padding:1rem 1.2rem;">
+    <div class="sb-meta" style="gap:0.6rem; margin-bottom:0.6rem;">
       <span>⏱️ ${escapeHtml(sb.duration || '10 SAAT')}</span>
       <span>📐 ${escapeHtml(sb.format || 'VERTICAL 9:16')}</span>
       <span>🎬 ${sb.scenes?.length || 4} SCENE</span>
-      <span>🎨 ${escapeHtml(sb.style || '')}</span>
+      <span>🎨 ${escapeHtml((sb.style || '').substring(0,40))}</span>
     </div>` +
-    (sb.audience ? `<p style="font-size:0.78rem; margin:0.35rem 0;"><strong>👥</strong> ${escapeHtml(sb.audience)}</p>` : '') +
-    (sb.audioSuggestion ? `<p style="font-size:0.78rem; margin:0.35rem 0;"><strong>🔊</strong> ${escapeHtml(sb.audioSuggestion)}</p>` : '') +
-    (sb.objective ? `<p style="font-size:0.78rem; margin:0.35rem 0;"><strong>🎯</strong> ${escapeHtml(sb.objective)}</p>` : '') +
-    (sb.characters ? `<p style="font-size:0.78rem; margin:0.35rem 0;"><strong>👤</strong> ${escapeHtml(sb.characters)}</p>` : '') +
+    (sb.audience ? `<p style="font-size:0.78rem; margin:0.35rem 0; line-height:1.5;"><strong>👥 Audience:</strong> ${escapeHtml(sb.audience)}</p>` : '') +
+    (sb.audioSuggestion ? `<p style="font-size:0.78rem; margin:0.35rem 0; line-height:1.5;"><strong>🔊 Audio:</strong> ${escapeHtml(sb.audioSuggestion)}</p>` : '') +
+    (sb.objective ? `<p style="font-size:0.78rem; margin:0.35rem 0; line-height:1.5;"><strong>🎯 Objektif:</strong> ${escapeHtml(sb.objective)}</p>` : '') +
+    (sb.characters ? `<p style="font-size:0.78rem; margin:0.35rem 0; line-height:1.5;"><strong>👤 Watak:</strong> ${escapeHtml(sb.characters)}</p>` : '') +
   `</div>`;
 
-  // Scene cards
-  const emojis = ['😰','😢','🤔','😊'];
+  // ═══ 4 PANEL GRID ═══
+  html += `<div class="sb-image-panel" style="margin:0.75rem 0;">`;
+  const sceneColors = ['#f87171','#fb923c','#60a5fa','#4ade80'];
+  const sceneIcons = ['😰','😢','🤔','😊'];
+  
   (sb.scenes || []).forEach((s, i) => {
-    html += `<div class="scene-block">
-      <div class="scene-num">🎬 Scene ${s.sceneNum} (${escapeHtml(s.timestamp || '')})</div>
-      <div class="scene-visual">${escapeHtml(s.visual || '')}</div>
-      <div class="scene-meta-row">
-        <span>🎥 ${escapeHtml(s.camera || '')}</span>
-        <span>💡 ${escapeHtml(s.emotion || '')}</span>
-        <span>🔗 ${escapeHtml(s.transition || 'Cut')}</span>
-      </div>` +
-      (s.dialogue && s.dialogue !== '[No dialogue]' ? `<div class="scene-dialogue">"${escapeHtml(s.dialogue)}"</div>` : '') +
-    `</div>`;
+    html += `<div class="panel-img" style="border:2px solid ${sceneColors[i]}; min-height:240px; background:var(--bg);">
+      <div style="position:absolute;top:0;left:0;right:0;background:${sceneColors[i]};color:#000;padding:0.35rem 0.6rem;font-size:0.65rem;font-weight:800;text-align:center;z-index:2;">
+        ${sceneIcons[i]} SCENE ${s.sceneNum} · ${escapeHtml(s.timestamp || '')}
+      </div>
+      <div style="padding:1.8rem 0.55rem 0.55rem;font-size:0.66rem;line-height:1.45;color:var(--text);height:100%;overflow-y:auto;">
+        <div style="margin-bottom:0.4rem;"><strong style="color:${sceneColors[i]};">🖼️ VISUAL:</strong> ${escapeHtml(s.visual || '—')}</div>
+        <div style="margin-bottom:0.4rem;"><strong style="color:${sceneColors[i]};">🎬 ACTION:</strong> ${escapeHtml(s.action || '—')}</div>
+        <div style="margin-bottom:0.4rem;"><strong style="color:${sceneColors[i]};">💡 EMOSI:</strong> ${escapeHtml(s.emotion || '—')}</div>
+        <div style="margin-bottom:0.4rem;"><strong style="color:${sceneColors[i]};">🎥 CAMERA:</strong> ${escapeHtml(s.camera || '—')}</div>
+        ${s.dialogue && s.dialogue !== '[No dialogue]' ? 
+          `<div style="background:rgba(240,160,48,0.08);border-left:3px solid var(--gold);padding:0.35rem 0.5rem;margin-top:0.4rem;border-radius:0 4px 4px 0;">
+            <strong style="color:var(--gold);">💬 DIALOG:</strong> <em style="color:#eee;">"${escapeHtml(s.dialogue)}"</em>
+          </div>` : ''}
+      </div>
+      ${sb.characters ? `<div style="position:absolute;bottom:0.35rem;right:0.4rem;font-size:0.55rem;color:var(--text2);z-index:1;">👤 ${escapeHtml(sb.characters.split('.')[0] || '')}</div>` : ''}
+    </div>`;
   });
+  html += `</div>`;
 
-  // Footer
-  html += `<div class="footer-bar">
+  // ═══ FOOTER ═══
+  html += `<div class="footer-bar" style="padding:0.6rem 0; font-size:0.72rem;">
     <span>⏱️ ${escapeHtml(sb.duration || '10 SAAT')}</span>
-    <span>📐 ${escapeHtml(sb.format || '9:16')}</span>
+    <span>📐 ${escapeHtml(sb.format || 'VERTICAL 9:16')}</span>
     <span>🎬 ${sb.scenes?.length || 4} SCENE</span>
-    <span>🎨 ${escapeHtml(sb.style || '')}</span>
+    ${sb.characters ? `<span>👤 ${escapeHtml(sb.characters.substring(0,60))}</span>` : ''}
+    <span>🎨 ${escapeHtml((sb.style || '').substring(0,40))}</span>
   </div>`;
 
   html += `<p style="margin-top:0.75rem;"><strong>Pilih satu:</strong></p>
