@@ -514,7 +514,24 @@ body::before {
 /* ─── FOOTER ─── */
 .footer-bar { display:flex; gap:0.6rem; flex-wrap:wrap; margin-top:0.75rem; padding-top:0.85rem; border-top:1px solid var(--border); font-size:0.72rem; color:var(--text2); }
 
-/* ─── RESPONSIVE ─── */
+/* ─── SCROLL TO TOP ─── */
+.scroll-top-btn {
+  position:fixed; bottom:2rem; right:2rem; z-index:90;
+  width:44px; height:44px; border-radius:50%;
+  background:linear-gradient(135deg, #f5a623, #e8901a);
+  color:#000; border:none; cursor:pointer;
+  font-size:1.2rem; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 20px rgba(245,166,35,0.35);
+  transition:all 0.3s ease;
+  opacity:0; transform:translateY(20px); pointer-events:none;
+}
+.scroll-top-btn.visible {
+  opacity:1; transform:translateY(0); pointer-events:auto;
+}
+.scroll-top-btn:hover {
+  transform:translateY(-3px); box-shadow:0 8px 30px rgba(245,166,35,0.5);
+}
+.scroll-top-btn:active { transform:translateY(0); }
 @media (max-width:600px) {
   .hero h1 { font-size:2rem; }
   .hero p { font-size:0.9rem; }
@@ -931,6 +948,9 @@ body::before {
 
 <!-- ═══════════ TOAST ═══════════ -->
 <div class="toast" id="toast"></div>
+
+<!-- ═══════════ SCROLL TO TOP ═══════════ -->
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Back to top">⬆</button>
 
 <script>
 // ═══════════════════ STORYBOARD UNIVERSAL PRO v2.1 ═══════════════════
@@ -1400,6 +1420,29 @@ function applyModelSelection() {
 // ═══════════════════ END MODEL SELECTION ═══════════════════
 
 // ═══════════════════ END MODEL DETECTION ═══════════════════
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showScrollTop() {
+  const btn = document.getElementById('scrollTopBtn');
+  if (btn) btn.classList.add('visible');
+}
+
+// Auto-hide when near top
+window.addEventListener('scroll', () => {
+  const btn = document.getElementById('scrollTopBtn');
+  if (!btn) return;
+  if (window.scrollY < 200) {
+    btn.classList.remove('visible');
+  } else {
+    // Only auto-show if it was already visible (from generation)
+    // Don't auto-show just from scrolling
+  }
+});
+
+// ═══════════════════ END SCROLL TOP ═══════════════════
 
 function updateNavStatus(on) {
   const el = document.getElementById('navStatus');
@@ -2120,6 +2163,8 @@ function scrollChat() {
   setTimeout(() => {
     const area = document.getElementById('chatArea');
     if (area) area.scrollIntoView({ behavior:'smooth', block:'end' });
+    // Show scroll-to-top button after content is added
+    showScrollTop();
   }, 100);
 }
 
@@ -2175,6 +2220,13 @@ CHARACTER CONSISTENCY:
 - Same face, same age, same clothing, same hairstyle, same accessories across ALL scenes
 - Never randomly alter character appearance
 - Same personality throughout
+
+DEVICE / PHONE HANDLING:
+- If talent holds phone for selfie: phone MUST be held NATURALLY, screen facing talent
+- Selfie grip: one or two hands, phone at eye level or slightly above, natural arm position
+- NEVER: phone backwards, upside down, covering camera lens, awkward wrist angle
+- If demonstrating product on phone: screen visible, fingers not blocking content
+- Gaming on phone: landscape orientation, two-hand grip, thumbs on screen
 
 RETENTION:
 - Scene 1: Curiosity, surprise, relatable pain point, or unexpected observation
@@ -2758,6 +2810,13 @@ PRODUCT CONSISTENCY:
 - Maintain: packaging shape, proportions, logo, typography, label, colors, materials, texture
 - Never redesign, simplify, recolor, or replace with generic product
 
+DEVICE / SCREEN HANDLING IN SCENES:
+- If scene involves phone, tablet, handheld gaming device, or any screen: describe EXACT grip and orientation
+- Phone/device always held CORRECTLY — landscape for gaming, natural two-hand grip
+- Screen faces character/viewer, thumbs on screen, fingers wrap around edges
+- NEVER: backwards device, upside-down screen, single-hand precarious hold, screen facing away
+- If character interacts with device: describe which hand does what, where fingers rest, viewing angle
+
 STYLE ENGINE (DOC): Boleh combine styles bila sesuai. Contoh mapping: Medical Card → Emotional Cinematic POV · Property → Mini People + House Tour · Coffee → Stop Motion + Aesthetic B-Roll · Hibah → Family Drama + Emotional Storytelling · Skincare → Macro Product Film. Jangan force UGC atau talking head.
 
 SPECIAL STYLE RULES (DOC — apply bila relevan):
@@ -3036,7 +3095,17 @@ NEGATIVE CONSTRAINTS (DOC):
 - No wardrobe changes unless the scene specifies it
 - No product redesign — if a product appears, keep packaging, logo, colors identical
 - No disconnected scenes — visual continuity must flow panel to panel
-- No watermarks, no artist signatures`;
+- No watermarks, no artist signatures
+
+DEVICE / PRODUCT HANDLING (CRITICAL):
+- If character holds a phone/device: grip must look NATURAL and CORRECT
+- Phone always held in LANDSCAPE orientation for gaming (not portrait, not upside down)
+- Both hands cupping sides of phone, thumbs resting on screen naturally
+- Screen MUST face towards character/viewer — NEVER backwards
+- Fingers wrap around edges, not covering screen
+- Device held at comfortable viewing angle (~30-45° tilt)
+- No awkward wrist angles, no backwards grip, no single-hand precarious hold
+- If product/device is the focus: center it, show it clearly, correct orientation`;
 
     try {
       const refImg = refImages.length > 0 ? refImages[0] : null;
