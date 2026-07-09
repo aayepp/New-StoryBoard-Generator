@@ -818,12 +818,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     const inp = document.getElementById('apiKeyInput');
     if(inp) inp.value = apiKey;
     onApiKeyChange();
+    // Auto-verify & recheck models every time website opens
+    setTimeout(()=>{ verifyApiKey(); }, 500);
   }
 });
 
 // ═══════════════════ API KEY MANAGEMENT ═══════════════════
 function onApiKeyChange(){
-  // Only store key on input change — DON'T auto-check models (wait for Apply button)
+  // Update UI based on key format — auto-verify happens on page load
   apiKey = document.getElementById('apiKeyInput').value.trim();
   const provider = getProvider();
   const statusEl = document.getElementById('navStatus');
@@ -832,7 +834,7 @@ function onApiKeyChange(){
   if(apiKey){
     if(provider === 'gemini'){
       statusEl.className = 'nav-status off';
-      statusEl.innerHTML = '🔑 Ready — click Apply';
+      statusEl.innerHTML = '🔑 Gemini — verifying...';
       if(applyBtn){ applyBtn.className = 'apply-key-btn'; applyBtn.textContent = '✅ Apply' }
     } else if(provider === 'deepseek'){
       statusEl.className = 'nav-status on';
