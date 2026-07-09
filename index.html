@@ -229,9 +229,15 @@ body{
 .drop-zone .dz-text{font-size:0.82rem;color:var(--text2)}
 .drop-zone .dz-hint{font-size:0.7rem;color:rgba(255,255,255,0.2);margin-top:0.3rem}
 .drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
-.drop-preview{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem}
+.drop-preview{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem;align-items:center}
 .drop-preview img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);transition:var(--transition)}
 .drop-preview img:hover{transform:scale(1.1);border-color:var(--gold)}
+.drop-thumb{position:relative;display:inline-flex;flex-shrink:0}
+.drop-thumb-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:10px;line-height:1;display:none;align-items:center;justify-content:center;z-index:2;padding:0}
+.drop-thumb:hover .drop-thumb-remove{display:flex}
+.drop-thumb-remove:hover{background:#ff5555;transform:scale(1.2)}
+.drop-clear-all{font-size:0.65rem;color:var(--red);cursor:pointer;text-decoration:underline;white-space:nowrap;user-select:none;opacity:0.7;transition:opacity 0.2s}
+.drop-clear-all:hover{opacity:1}
 
 /* ═══════════════════ OUTPUT AREA ═══════════════════ */
 .output-container{display:none;max-width:var(--max-w);margin:0 auto;padding:1.5rem 2rem 4rem;position:relative;z-index:1}
@@ -325,14 +331,31 @@ body{
 .img-grid img:hover{transform:scale(1.03);border-color:var(--gold);box-shadow:0 4px 20px rgba(240,160,48,0.2)}
 
 /* Lightbox */
-.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:0.75rem}
 .lightbox.open{display:flex}
-.lightbox img{max-width:90vw;max-height:80vh;border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,0.6)}
-.lightbox .close-hint{position:absolute;top:1.5rem;right:2rem;font-size:2.5rem;color:#fff;cursor:pointer;z-index:1}
-.lightbox .lb-actions{display:flex;gap:0.75rem}
+.lb-img-wrap{overflow:auto;max-width:92vw;max-height:72vh;display:flex;align-items:center;justify-content:center;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.2) transparent}
+.lb-img-wrap img{max-width:100%;max-height:100%;border-radius:var(--radius);box-shadow:0 20px 60px rgba(0,0,0,0.6);transition:transform 0.25s ease;transform-origin:center center;cursor:grab}
+.lb-img-wrap img:active{cursor:grabbing}
+.lightbox .close-hint{position:absolute;top:1rem;right:1.5rem;font-size:2.5rem;color:#fff;cursor:pointer;z-index:2;line-height:1;opacity:0.7;transition:opacity 0.2s}
+.lightbox .close-hint:hover{opacity:1}
+.lb-zoom-controls{display:flex;align-items:center;gap:0.5rem;z-index:2}
+.lb-zoom-controls button{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.lb-zoom-controls button:hover{background:rgba(255,255,255,0.15);border-color:var(--gold)}
+.lb-zoom-level{font-size:0.75rem;color:rgba(255,255,255,0.6);min-width:42px;text-align:center;font-weight:600}
+.lb-zoom-controls button:nth-child(4){font-size:0.9rem}
+.lightbox .lb-actions{display:flex;gap:0.75rem;z-index:2}
 .lightbox .lb-actions button{padding:0.6rem 1.5rem;border-radius:25px;font-weight:600;border:none;cursor:pointer;font-family:var(--font);font-size:0.85rem}
 .lightbox .lb-actions button:first-child{background:var(--gold);color:#000}
-.lightbox .lb-actions button:last-child{background:rgba(255,255,255,0.1);color:#fff}
+.lightbox .lb-actions button:nth-child(2){background:rgba(104,176,248,0.15);color:var(--blue);border:1px solid rgba(104,176,248,0.25)}
+.lightbox .lb-actions button:nth-child(2):hover{background:rgba(104,176,248,0.25)}
+.lightbox .lb-actions button:last-child{background:rgba(255,255,255,0.08);color:#fff}
+
+/* Floating scroll buttons */
+.float-scroll-btn{position:fixed;z-index:180;width:40px;height:40px;border-radius:50%;background:rgba(18,18,58,0.85);backdrop-filter:blur(12px);border:1px solid rgba(240,160,48,0.25);color:var(--gold);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.3s ease;opacity:0;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+.float-scroll-btn.visible{opacity:1;pointer-events:auto}
+.float-scroll-btn:hover{transform:scale(1.12);border-color:var(--gold);box-shadow:0 6px 24px rgba(240,160,48,0.25)}
+.float-scroll-top{top:120px;right:1.5rem}
+.float-scroll-bottom{bottom:2rem;right:1.5rem}
 </style>
 </head>
 <body>
@@ -561,10 +584,10 @@ body{
   <!-- GRAFIX FORM -->
   <div class="th-form" id="grafixForm">
     <h3>📊 Grafix — Short-Form Video Storyboard Director</h3>
-    <p class="form-desc">10 visual style — Cyber-Dashboard, Edgy Journalist, Cinematic Prestige & lagi. 6 scene × 5s = 30s. Dengan motion graphics, custom VFX, Malay dialogue. Sesuai untuk: explainer, problem-solution ads, brand campaign.</p>
+    <p class="form-desc">10 visual style — Cyber-Dashboard, Edgy Journalist, Cinematic Prestige & lagi. Dengan motion graphics, custom VFX, Malay dialogue. Sesuai untuk: explainer, problem-solution ads, brand campaign.</p>
     <div class="form-row"><input type="text" id="gfTopic" placeholder="Topik / Masalah / Produk..."></div>
     <div class="form-row">
-      <select id="gfDuration"><option value="30" selected>30 saat (6 scene)</option><option value="45">45 saat (9 scene)</option><option value="60">60 saat (12 scene)</option></select>
+      <select id="gfDuration"><option value="10">10 saat (3 scene)</option><option value="30" selected>30 saat (6 scene)</option><option value="45">45 saat (9 scene)</option><option value="60">60 saat (12 scene)</option></select>
       <select id="gfStyle"><option value="auto">🤖 Auto-Select</option><option value="cyber-dashboard">Cyber-Dashboard</option><option value="edgy-journalist">Edgy Journalist</option><option value="minimalist-executive">Minimalist Executive</option><option value="cinematic-prestige">Cinematic Prestige</option><option value="modern-real-estate">Modern Real Estate</option><option value="stadium-broadcast">Stadium Broadcast</option><option value="organic-infographic">Organic Infographic</option><option value="financial-blueprint">Financial Blueprint</option><option value="aggressive-street">Aggressive Street</option><option value="leaderboard-tracker">Leaderboard Tracker</option></select>
     </div>
     <div class="form-row"><select id="gfAspect"><option value="9:16" selected>📱 9:16</option><option value="16:9">🖥️ 16:9</option><option value="1:1">⬛ 1:1</option></select></div>
@@ -598,12 +621,25 @@ body{
 <!-- ═══════════ LIGHTBOX ═══════════ -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <span class="close-hint">&times;</span>
-  <img id="lightboxImg" src="" alt="Preview" onclick="event.stopPropagation()">
+  <div class="lb-zoom-controls" onclick="event.stopPropagation()">
+    <button onclick="zoomLightbox(-0.25)" title="Zoom Out">🔍➖</button>
+    <span class="lb-zoom-level" id="lbZoomLevel">100%</span>
+    <button onclick="zoomLightbox(0.25)" title="Zoom In">🔍➕</button>
+    <button onclick="resetLightboxZoom()" title="Reset">🔄</button>
+  </div>
+  <div class="lb-img-wrap" id="lbImgWrap">
+    <img id="lightboxImg" src="" alt="Preview" onclick="event.stopPropagation()" draggable="false">
+  </div>
   <div class="lb-actions" onclick="event.stopPropagation()">
     <button onclick="downloadStoryboardComposite()">⬇️ Muat Turun</button>
+    <button onclick="copyLastPrompt()">📋 Copy Prompt</button>
     <button onclick="closeLightbox()">✖ Tutup</button>
   </div>
 </div>
+
+<!-- ═══════════ FLOATING SCROLL BUTTONS ═══════════ -->
+<button class="float-scroll-btn float-scroll-top" id="floatScrollTop" onclick="scrollToTop()" title="Go to Top">⬆️</button>
+<button class="float-scroll-btn float-scroll-bottom" id="floatScrollBottom" onclick="scrollToBottom()" title="Go to Bottom">⬇️</button>
 
 <!-- ═══════════ EDIT OVERLAY ═══════════ -->
 <div class="edit-overlay" id="editOverlay">
@@ -773,6 +809,8 @@ let availableImageModels = [];
 let modelCheckInProgress = false;
 let generatedImages = [];
 let currentCompositeData = null;
+let _lastCompositePrompt = '';
+let _lightboxZoom = 1;
 
 // Initialize API key on DOM ready (must wait for DOM)
 document.addEventListener('DOMContentLoaded',()=>{
@@ -946,11 +984,15 @@ async function checkAvailableModels(forceRefresh=false){
     const allModels = data.models || [];
     
     // Current Gemini image model lineup (July 2026) — prioritize latest
+    // gemini-3-pro-image = Nano Banana Pro (GA, best quality, legible text)
+    // gemini-3.1-flash-image = Nano Banana 2 (GA, fast + high quality)
+    // gemini-3.1-flash-lite-image = Nano Banana 2 Lite (GA, cheapest)
+    // gemini-2.5-flash-image = Nano Banana (GA, legacy stable)
     const candidatePrefixes = [
-      'gemini-3-pro-image',          // Nano Banana Pro (GA June 2026)
-      'gemini-3.1-flash-image',      // Nano Banana 2 (matches -preview too)
+      'gemini-3-pro-image',          // Nano Banana Pro — best for composite sheets (text rendering)
+      'gemini-3.1-flash-image',      // Nano Banana 2
       'gemini-3.1-flash-lite-image', // Nano Banana 2 Lite
-      'gemini-2.5-flash-image',      // Nano Banana (legacy, stable)
+      'gemini-2.5-flash-image',      // Nano Banana (legacy)
     ];
     
     availableImageModels = [];
@@ -1122,13 +1164,30 @@ function handleDropFiles(input,dropZoneId){
   const zone=document.getElementById(dropZoneId);
   const preview=zone.querySelector('.drop-preview');
   if(!preview)return;
+  renderDropPreview(input, zone);
+}
+
+function renderDropPreview(input, zone){
+  const preview=zone.querySelector('.drop-preview');
+  if(!preview)return;
   preview.innerHTML='';
+  const files=input.files;
+  if(!files||files.length===0) return;
   const maxShow=5;
   for(let i=0;i<Math.min(files.length,maxShow);i++){
+    const wrap=document.createElement('div');
+    wrap.className='drop-thumb';
     const img=document.createElement('img');
     img.src=URL.createObjectURL(files[i]);
     img.title=files[i].name;
-    preview.appendChild(img);
+    const rm=document.createElement('button');
+    rm.className='drop-thumb-remove';
+    rm.textContent='✕';
+    rm.title='Remove '+files[i].name;
+    rm.onclick=(e)=>{ e.stopPropagation(); e.preventDefault(); removeDropFile(input, i, zone.id); };
+    wrap.appendChild(img);
+    wrap.appendChild(rm);
+    preview.appendChild(wrap);
   }
   if(files.length>maxShow){
     const count=document.createElement('span');
@@ -1136,6 +1195,33 @@ function handleDropFiles(input,dropZoneId){
     count.textContent=`+${files.length-maxShow}`;
     count.style.cssText='font-size:0.7rem;color:var(--text2);align-self:center';
     preview.appendChild(count);
+  }
+  // Clear all link
+  const clear=document.createElement('span');
+  clear.className='drop-clear-all';
+  clear.textContent='✕ Clear all';
+  clear.onclick=(e)=>{ e.stopPropagation(); clearDropFiles(input, zone.id); };
+  preview.appendChild(clear);
+}
+
+function removeDropFile(input, index, dropZoneId){
+  const files=input.files;
+  if(!files||index>=files.length) return;
+  const dt=new DataTransfer();
+  for(let i=0;i<files.length;i++){
+    if(i!==index) dt.items.add(files[i]);
+  }
+  input.files=dt.files;
+  const zone=document.getElementById(dropZoneId);
+  if(zone) renderDropPreview(input, zone);
+}
+
+function clearDropFiles(input, dropZoneId){
+  input.value='';
+  const zone=document.getElementById(dropZoneId);
+  if(zone){
+    const preview=zone.querySelector('.drop-preview');
+    if(preview) preview.innerHTML='';
   }
 }
 
@@ -1207,12 +1293,58 @@ function escapeHtml(text){
 function openLightbox(src){
   const lb=document.getElementById('lightbox');
   document.getElementById('lightboxImg').src=src;
+  _lightboxZoom=1;
+  document.getElementById('lightboxImg').style.transform='scale(1)';
+  document.getElementById('lbZoomLevel').textContent='100%';
   lb.classList.add('open');
 }
 
 function closeLightbox(){
   document.getElementById('lightbox').classList.remove('open');
+  _lightboxZoom=1;
+  document.getElementById('lightboxImg').style.transform='scale(1)';
 }
+
+function zoomLightbox(delta){
+  _lightboxZoom=Math.max(0.25, Math.min(3, _lightboxZoom+delta));
+  document.getElementById('lightboxImg').style.transform=`scale(${_lightboxZoom})`;
+  document.getElementById('lbZoomLevel').textContent=Math.round(_lightboxZoom*100)+'%';
+}
+
+function resetLightboxZoom(){
+  _lightboxZoom=1;
+  document.getElementById('lightboxImg').style.transform='scale(1)';
+  document.getElementById('lbZoomLevel').textContent='100%';
+}
+
+function copyLastPrompt(){
+  if(!_lastCompositePrompt){ showToast('No prompt to copy — generate dulu!',true); return }
+  navigator.clipboard.writeText(_lastCompositePrompt).then(()=>{
+    showToast('✅ Prompt copied to clipboard!');
+  }).catch(()=>{
+    // Fallback for non-HTTPS
+    const ta=document.createElement('textarea');
+    ta.value=_lastCompositePrompt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('✅ Prompt copied!');
+  });
+}
+
+// ═══════════════════ FLOATING SCROLL BUTTONS ═══════════════════
+function scrollToTop(){ window.scrollTo({top:0,behavior:'smooth'}) }
+function scrollToBottom(){ window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}) }
+
+// Show/hide floating buttons based on scroll position
+window.addEventListener('scroll',()=>{
+  const topBtn=document.getElementById('floatScrollTop');
+  const botBtn=document.getElementById('floatScrollBottom');
+  if(!topBtn||!botBtn) return;
+  const scrolled=window.scrollY>300;
+  const atBottom=window.scrollY+window.innerHeight>=document.body.scrollHeight-300;
+  topBtn.classList.toggle('visible',scrolled);
+  botBtn.classList.toggle('visible',scrolled&&!atBottom);
+});
 
 // ═══════════════════ API CALLS ═══════════════════
 async function callGeminiText(prompt,images=[]){
@@ -1223,7 +1355,7 @@ async function callGeminiText(prompt,images=[]){
 }
 
 async function callGeminiTextAPI(prompt,images=[]){
-  const models=['gemini-2.5-pro','gemini-2.5-flash','gemini-flash-latest'];
+  const models=['gemini-3.5-flash','gemini-2.5-pro','gemini-2.5-flash'];
   let lastError=null;
   
   for(const model of models){
@@ -1503,8 +1635,10 @@ async function startCinematic(){
   let refImages=[];
   if(refFiles&&refFiles.length>0) refImages=await readFilesAsBase64Array(refFiles);
   window._lastRefImages = refImages; // Store for image generation
+  window._lastAudience = audience; // Store for composite sheet
   
   isGenerating=true; document.getElementById('outputContainer').classList.add('visible');
+  document.getElementById('chatArea').innerHTML=''; // Restart chat
   addUserMsg(`🎬 Cinematic | ${topic} | ${duration}s | ${style} | ${aspect}${audience?' | '+audience:''}${refImages.length?' | '+refImages.length+' imej':''}`);
   addTyping('Generating cinematic storyboard...');
   
@@ -1528,8 +1662,10 @@ async function startTalkingHead(){
   let refImages=[];
   if(refFiles&&refFiles.length>0) refImages=await readFilesAsBase64Array(refFiles);
   window._lastRefImages = refImages;
+  window._lastAudience = audience;
   
   isGenerating=true; document.getElementById('outputContainer').classList.add('visible');
+  document.getElementById('chatArea').innerHTML=''; // Restart chat
   addUserMsg(`🤳 Talking Head | ${topic} | ${duration}s | ${tone} | ${aspect}${audience?' | '+audience:''}${refImages.length?' | '+refImages.length+' imej':''}`);
   addTyping('Generating talking head storyboard...');
   
@@ -1553,8 +1689,10 @@ async function startStopMotion(){
   let refImages=[];
   if(refFiles&&refFiles.length>0) refImages=await readFilesAsBase64Array(refFiles);
   window._lastRefImages = refImages;
+  window._lastAudience = audience;
   
   isGenerating=true; document.getElementById('outputContainer').classList.add('visible');
+  document.getElementById('chatArea').innerHTML=''; // Restart chat
   addUserMsg(`🧩 Stop Motion | ${topic} | ${duration}s | ${style} | ${aspect}${audience?' | '+audience:''}${refImages.length?' | '+refImages.length+' imej':''}`);
   addTyping('Generating stop motion storyboard...');
   
@@ -1578,8 +1716,10 @@ async function startGrafix(){
   let refImages=[];
   if(refFiles&&refFiles.length>0) refImages=await readFilesAsBase64Array(refFiles);
   window._lastRefImages = refImages;
+  window._lastAudience = audience;
   
   isGenerating=true; document.getElementById('outputContainer').classList.add('visible');
+  document.getElementById('chatArea').innerHTML=''; // Restart chat
   addUserMsg(`📊 Grafix | ${topic} | ${duration}s | ${aspect} | ${style}${audience?' | '+audience:''}${refImages.length?' | '+refImages.length+' imej':''}`);
   addTyping('Generating grafix storyboard...');
   
@@ -1600,6 +1740,7 @@ async function startCharacterSheet(){
   if(refFiles&&refFiles.length>0) refImages=await readFilesAsBase64Array(refFiles);
   
   isGenerating=true; document.getElementById('outputContainer').classList.add('visible');
+  document.getElementById('chatArea').innerHTML=''; // Restart chat
   addUserMsg(`📋 Character Sheet | ${name||'Auto-detect'} | ${refImages.length} imej rujukan`);
   addTyping('Analyzing subject & generating character sheet...');
   
@@ -1645,6 +1786,8 @@ OUTPUT FORMAT — Return ONLY valid JSON:
   "duration": "${duration}s",
   "suggested_style": "[Auto-selected style/combo]",
   "why_style": "[Short BM explanation]",
+  "audio_suggestion": "[Recommended audio: music style, ambience, sound effects — e.g. Emotional Piano, Ambience Hospital, Heartbeat Impact]",
+  "audience": "[Target audience in BM — e.g. Keluarga Muda (25-40 Tahun)]",
   "character_anchor": "[Detailed consistent description of main character/product — repeated identity anchor: face, age, hair, clothing, colors, branding]",
   "scenes": [
     {
@@ -1718,18 +1861,19 @@ Generate exactly ${sceneCount} scenes. Each ${perScene}s.`;
 // ═══════════════════ TALKING HEAD STORYBOARD ═══════════════════
 async function generateStoryboardTalkingHead(topic,duration,tone,aspect,audience,refImages){
   const totalSec=parseInt(duration);
-  // Talking head scene mapping: 10s=3, 15s=4, 20s=5, 30s=6, 45s=9, 60s=12
-  const sceneMap={10:3,15:4,20:5,30:6,45:9,60:12};
+  // Talking head scene mapping: 10s=2, 15s=4, 20s=5, 30s=6, 45s=9, 60s=12
+  const sceneMap={10:2,15:4,20:5,30:6,45:9,60:12};
   const sceneCount=sceneMap[totalSec]||Math.round(totalSec/5);
   const perScene=(totalSec/sceneCount).toFixed(1);
   
   const systemPrompt=`You are an expert VIRAL TALKING-HEAD STORYBOARD GENERATOR for short-form social video (TikTok, Instagram Reels, YouTube Shorts, Facebook Reels).
 
-Your job: Transform user topic into a complete storyboard for a realistic influencer-style talking-head video — a real person recording themselves with a smartphone.
+Your job: Transform user topic into a complete storyboard for a realistic influencer-style talking-head video — a real person looking directly into the camera lens, speaking naturally to the audience. NO phone in hand, NO selfie grip, NO looking at phone screen. The character's eyes are ALWAYS on the camera lens, like a vlogger or presenter speaking straight to their viewers.
 
-CORE CREATIVE PRINCIPLE: Think like a social media creator speaking directly to viewers. Do NOT write like: corporate advertiser, formal presenter, news anchor, documentary narrator, screenplay writer, robotic AI assistant.
+CORE CREATIVE PRINCIPLE: Think like a social media creator speaking directly to viewers. Do NOT write like: corporate advertiser, formal presenter, news anchor, documentary narrator, screenplay writer, robotic AI assistant. The character NEVER holds or looks at a phone — they talk TO the camera, not THROUGH a phone.
 
 FORBIDDEN STYLES: Animation, Anime, Fantasy, formal news report, formal documentary, corporate presentation, overproduced commercial aesthetics.
+FORBIDDEN ACTIONS: Holding phone, looking at phone screen, selfie grip, phone in frame, mirror selfie, recording setup visible.
 
 STORY DESIGN — auto-select best flow: personal story, personal experience, problem→solution, before→after, testimonial-style sharing, curiosity-driven opening, emotional sharing, product experience. Do not name the framework in output.
 
@@ -1739,14 +1883,17 @@ DIALOGUE RULES (CRITICAL — validate every scene):
 - Exactly 2 sentences per scene
 - Total 15-20 words per dialogue
 - Natural spoken Malaysian Malay — casual, easy to pronounce, conversational, non-formal, non-robotic, non-corporate
-- Must sound like a real influencer speaking to a phone camera
+- Must sound like a real influencer speaking naturally, looking straight into the camera lens
 - Each scene must CONNECT to the previous scene and MOVE the story forward
 - No repeated information, no static storytelling — maintain curiosity and momentum
 
-CAMERA RULES:
-- ALL scenes must appear smartphone-recorded and believable as real phone footage
+CAMERA RULES (CRITICAL — EYES ON LENS):
+- Character ALWAYS looks directly into the camera lens — never at a phone, never at a screen, never away
+- Face fully visible, eyes locked on lens, natural blinking, genuine expressions
+- ALL scenes appear as professional vlog/talking-head footage — camera on tripod or stable surface, NOT handheld selfie
 - DIFFERENT camera angle for each scene — NEVER repeat consecutively
-- Angles: Close Up Selfie, Medium Close Up, Slight Left Angle, Slight Right Angle, Looking Down At Camera, Looking Up At Camera, Walking Selfie, Sitting On Bed, Sofa Angle, Window Light Angle, Holding Phone Selfie, Hand Gesture Talking, Side Profile Talking, Natural Laugh Moment, Looking Away Then Back, Leaning On Table
+- Angles: Close Up Face (eyes on lens), Medium Close Up Chest-Up, Slight Left Profile (still looking at lens), Slight Right Profile (still looking at lens), Low Angle Looking Slightly Up, High Angle Looking Slightly Down, Sitting Cross-Legged Floor, Sofa Lean-Back Casual, Window Light Natural, Standing Full Body, Hand Gesture Explaining (hands visible but NO phone), Lean Forward Intense, Natural Laugh Looking At Lens, Look Away Brief Then Back To Lens, Walking Indoor Slow (eyes on camera)
+- FORBIDDEN ANGLES: Holding Phone Selfie, Mirror Selfie, Looking At Phone Screen, Phone In Frame, Selfie Stick, Ring Light Visible, Any Phone-Related Pose
 
 CHARACTER CONSISTENCY: Same face, age, gender presentation, clothing, hairstyle, accessories, personality, identity across ALL scenes.
 PRODUCT CONSISTENCY (if product provided): original packaging, logo, typography, colors, materials, proportions, branding — never redesign.
@@ -1772,7 +1919,7 @@ OUTPUT FORMAT — Return ONLY valid JSON:
     {
       "scene_num": 1,
       "timecode": "0s–5s",
-      "camera_angle": "[Specific smartphone angle]",
+      "camera_angle": "[Character looks directly into camera lens — specify shot type, framing, background]",
       "dialogue": "[Exactly 2 sentences, 15-20 words total, natural BM]",
       "action": "[Facial expression, gesture, body language]",
       "emotion": "[Emotional tone]"
@@ -1936,52 +2083,98 @@ OUTPUT FORMAT — Return ONLY valid JSON:
 // ═══════════════════ GRAFIX STORYBOARD ═══════════════════
 async function generateStoryboardGrafix(topic,duration,aspect,style,audience,refImages){
   const totalSec=parseInt(duration);
-  const sceneCount=Math.round(totalSec/5);
-  const perScene=5;
+  // 10s=3 scenes (~3.3s), 30s=6 (5s), 45s=9 (5s), 60s=12 (5s)
+  const sceneMap={10:3,30:6,45:9,60:12};
+  const sceneCount=sceneMap[totalSec]||Math.round(totalSec/5);
+  const perScene=(totalSec/sceneCount).toFixed(1);
   
   const styleNames={'cyber-dashboard':'Cyber-Dashboard','edgy-journalist':'The Edgy Journalist','minimalist-executive':'Minimalist Executive','cinematic-prestige':'Cinematic Prestige','modern-real-estate':'Modern Real Estate','stadium-broadcast':'Stadium Broadcast','organic-infographic':'Organic Infographic','financial-blueprint':'The Financial Blueprint','aggressive-street':'Aggressive Street-Style','leaderboard-tracker':'Leaderboard Tracker','auto':'Auto-Select'};
   
   const systemPrompt=`You are an expert Short-Form Video Director, AI Prompt Engineer, Visual Strategist, Motion Graphics Designer, Advertising Creative Director, and Storyboard Planner.
 
-Your purpose: Transform user topic into a complete ${totalSec}-second vertical short-form video blueprint for TikTok/Reels/Shorts/UGC ads/AI video generators. Prioritize: strong first-second retention, fast visual communication, emotional engagement, curiosity, clear narrative escalation, mobile-first composition, short spoken dialogue, visual variety, strong CTA behavior.
+Your purpose is to transform any user-provided Topic, Product, Service, Fact, Story, Educational message, Marketing angle, Awareness campaign, Business offer, or Social media concept into a complete ${totalSec}-second vertical short-form video blueprint.
 
-CORE RULES: Generate exactly ${sceneCount} scenes, ${perScene}s per scene, total ${totalSec}s. NEVER change scene count. Make reasonable creative assumptions — no follow-up questions. Internally determine: core audience, pain point, benefit, primary+secondary emotional trigger, best visual style, hook, narrative progression, solution reveal, CTA mechanism. Do not expose hidden reasoning.
+Optimize outputs for: TikTok, Instagram Reels, Facebook Reels, YouTube Shorts, UGC advertisements, AI video generators, Text-to-video systems, Image-to-video systems, Motion graphics production, Commercial advertising workflows.
+
+The final blueprint must prioritize: Strong first-second retention, Fast visual communication, Emotional engagement, Curiosity, Clear narrative escalation, Mobile-first composition, Short spoken dialogue, Visual variety, Strong CTA behavior.
+
+CORE OPERATING RULES:
+- When the user provides a usable topic, immediately create the blueprint. Do not ask follow-up questions when the topic can reasonably be interpreted. Make reasonable creative assumptions when information is missing.
+- Internally determine: Core audience, Core pain point, Core benefit, Primary emotional trigger, Secondary emotional trigger, Best visual style, Best hook mechanism, Best narrative progression, Best solution reveal, Best CTA mechanism. Do not expose lengthy hidden reasoning. Provide only concise strategic conclusions and the completed production blueprint.
+- Generate exactly ${sceneCount} scenes, ${perScene}s per scene, total ${totalSec}s. NEVER change scene count.
 
 VISUAL STYLE LIBRARY — select exactly ONE primary style:
-1. THE EDGY JOURNALIST — Torn newspaper textures, paper tear transitions, stop-motion jitter, typewriter typography, investigative framing, headline overlays, red circles/annotations, evidence-board energy. Best for: awareness, problems, facts, news, exposing issues.
-2. CYBER-DASHBOARD — Dark futuristic interfaces, neon blue/purple, floating dashboards, glassmorphism, holographic charts, data streams, scanning effects, AI processing visuals. Best for: technology, AI, SaaS, apps, automation, software.
-3. MINIMALIST EXECUTIVE — Clean white backgrounds, grey accents, premium typography, clay-style icons, corporate layouts, restrained motion, elegant charts. Best for: agencies, finance, leadership, B2B, consulting.
-4. CINEMATIC PRESTIGE — Dramatic lighting, atmospheric particles, luxury environments, premium product focus, shallow DOF, slow controlled camera, rich contrast, hero compositions. Best for: branding, premium products, luxury, emotional campaigns.
-5. MODERN REAL ESTATE — Architectural lighting, gold accents, wide-angle lenses, luxury property imagery, floor-plan overlays, property data graphics, elegant map animations. Best for: property, investment, real estate.
-6. STADIUM BROADCAST — Stadium lights, sports broadcast graphics, dynamic overlays, formation diagrams, scoreboard motion, fast tracking shots, crowd energy. Best for: sports, motivation, competition.
-7. ORGANIC INFOGRAPHIC — Green tones, water effects, natural textures, educational graphics, biological diagrams, smooth infographic motion, organic particles. Best for: health, wellness, science, education, environment.
-8. THE FINANCIAL BLUEPRINT — Blueprint textures, gold coins, security icons, calculation overlays, protection diagrams, financial flow graphics, family security symbolism. Best for: takaful, insurance, legacy planning, savings.
-9. AGGRESSIVE STREET-STYLE — Black/yellow/red, graffiti, camera shake, hard cuts, impact typography, high-energy transitions, gritty textures. Best for: motivation, hard sell, urgency, disruptive campaigns.
-10. LEADERBOARD TRACKER — Growth charts, KPI dashboards, trend arrows, rankings, progress bars, competitive scoreboards, performance meters. Best for: tracking, targets, sales, growth, metrics.
+1. THE EDGY JOURNALIST — Torn newspaper textures, paper tear transitions, stop-motion jitter, typewriter typography, investigative framing, documentary tension, headline overlays, red circles/annotations, evidence-board energy. Best for: awareness, problems, facts, news, investigations, exposing issues, public-interest content.
+2. CYBER-DASHBOARD — Dark futuristic interfaces, neon blue/purple, floating dashboards, glassmorphism, holographic charts, data streams, scanning effects, AI processing visuals. Best for: technology, AI, SaaS, apps, automation, digital transformation, software.
+3. MINIMALIST EXECUTIVE — Clean white backgrounds, grey accents, premium typography, clay-style icons, corporate layouts, restrained motion, elegant charts, professional spacing. Best for: agencies, finance, leadership, business, consulting, B2B services.
+4. CINEMATIC PRESTIGE — Dramatic lighting, atmospheric particles, luxury environments, premium product focus, shallow depth of field, slow controlled camera movement, rich contrast, hero compositions. Best for: branding, premium products, high-end marketing, luxury offers, emotional campaigns.
+5. MODERN REAL ESTATE — Architectural lighting, gold accents, wide-angle lenses, luxury property imagery, floor-plan overlays, property data graphics, elegant map animations. Best for: property, investment, asset marketing, development projects, real estate education.
+6. STADIUM BROADCAST — Stadium lights, sports broadcast graphics, dynamic overlays, formation diagrams, scoreboard motion, fast tracking shots, crowd energy. Best for: sports, motivation, team performance, competition, athlete content.
+7. ORGANIC INFOGRAPHIC — Green tones, water effects, natural textures, educational graphics, biological diagrams, smooth infographic motion, organic particles. Best for: health, wellness, science, educational content, environment, natural products.
+8. THE FINANCIAL BLUEPRINT — Blueprint textures, gold coins, security icons, calculation overlays, protection diagrams, financial flow graphics, family security symbolism. Best for: takaful, insurance, legacy planning, savings, financial protection, family planning.
+9. AGGRESSIVE STREET-STYLE — Black/yellow/red, graffiti, camera shake, hard cuts, impact typography, high-energy transitions, gritty textures. Best for: motivation, hard sell, strong CTA, urgency, disruptive campaigns.
+10. LEADERBOARD TRACKER — Growth charts, KPI dashboards, trend arrows, rankings, progress bars, competitive scoreboards, performance meters. Best for: tracking, targets, performance, sales, growth, rankings, business metrics.
 
 ${style!=='auto'?`SELECTED STYLE: ${styleNames[style]||style}`:'AUTO-SELECT best style based on topic.'}
 
-CUSTOM MOTION GRAPHICS: Design 3 topic-specific motion graphics — NEVER generic. Examples — Cancer: Statistics Counter, Medical Headlines Scanner, Health Risk Radar. Property: House Value Meter, Mortgage Calculator Overlay, Appreciation Growth Chart. Takaful: Legacy Fund Counter, Family Protection Shield, Claim Protection Meter. AI: Neural Network Grid, Automation Flow Map, AI Processing Core.
+CUSTOM MOTION GRAPHICS: Design exactly 3 topic-specific motion graphics — NEVER generic. The three motion graphics must be custom-designed for the actual topic. Examples: Cancer topic → Cancer Statistics Counter, Medical Headlines Scanner, Health Risk Radar. Property topic → House Value Meter, Mortgage Calculator Overlay, Appreciation Growth Chart. Takaful topic → Legacy Fund Counter, Family Protection Shield, Claim Protection Meter. AI topic → Neural Network Grid, Automation Flow Map, AI Processing Core. Names and functions must change according to the user’s topic.
 
-SCENE ARCHITECTURE (${sceneCount} scenes):
-- Scene 1 THE HOOK: Stop scrolling, immediate visual impact, curiosity — tension, surprise, contradiction, fear, desire, or information gap. Fast opening impact, pattern interrupt, kinetic text, sound hit.
-- Scene 2 THE AGITATION: Reveal main problem, show pain point, make it personally relevant — answer "Kenapa benda ni masalah untuk aku?" Relatable consequences, topic-specific overlays.
-- Scene 3 DEEPENING: Escalate consequences, increase emotional stakes — fear of loss, missed opportunity, financial/time pressure, family concern, future regret. Do NOT repeat Scene 2 — INTENSIFY.
-- Scene 4 THE SOLUTION: Reveal product/method/service — clear turning point: "Ini cara masalah tadi boleh diselesaikan." NO unsupported guarantees, NO fabricated proof, NO invented statistics.
-- Scene 5 EXTRA BENEFIT: Bonus benefit, emotional reward, transformation — relief, confidence, security, freedom, family peace, growth. Shift tone toward positive transformation.
-- Scene 6 CTA: Drive action naturally — comment a keyword, share with someone relevant, DM for info. Keep spoken line short, strong visual closure.
+SCENE ARCHITECTURE (${sceneCount} scenes, ${perScene}s each):
+${sceneCount===3?`SCENE 1 — HOOK+AGITATE (${perScene}s): Stop scrolling IMMEDIATELY. Create immediate visual impact + trigger curiosity + introduce pain point in ONE hit. Answer "Kenapa aku kena tengok ni?" Fast opening impact, pattern interrupt, kinetic text, sound hit. Visual prompt in English: describe subject, environment, camera framing, lighting, movement, vertical 9:16, matching style. Malay dialogue: natural Malaysian, short, spoken, curiosity-driven. Editing: fast opening impact, pattern interrupt, kinetic text, sound hit, relevant motion graphic. Do NOT use unnecessary exposition.
 
-VISUAL PROMPT ENGINEERING: Every visual_prompt in English, production-ready: main subject, environment, action, camera shot, camera movement, lighting, color palette, mood, selected style, vertical 9:16 framing, relevant motion graphics. Preferred vocabulary: cinematic commercial photography, realistic human movement, premium advertising lighting, dynamic camera push-in, handheld urgency, shallow depth of field, volumetric lighting, high contrast, clean subject separation, mobile-first framing, realistic textures, commercial campaign quality. Do not overload with meaningless adjectives. Maintain visual continuity across all scenes.
+SCENE 2 — DEEPEN+SOLUTION (${perScene}s): Escalate consequences THEN reveal the fix. Transition from "ini serious" to "tapi ada cara." Increase emotional stakes: fear of loss, missed opportunity, financial/time pressure, family concern, future regret. Then reveal product/method/service as clear turning point: "Ini cara masalah tadi boleh diselesaikan." NO unsupported guarantees, NO fabricated proof, NO invented statistics. If factual information is uncertain, phrase it carefully.
 
-MALAY DIALOGUE: Bahasa Melayu Malaysia — natural spoken rhythm, TikTok-friendly, short sentences, high-retention wording, familiar Malaysian vocabulary. Speakable within ~${perScene} seconds. AVOID: Indonesian phrasing, stiff corporate language, academic essays, unnatural direct translations.
+SCENE 3 — BENEFIT+CTA (${perScene}s): Emotional payoff + transformation + drive action. Show emotional reward: relief, confidence, security, freedom, family peace, growth. Visual tone shifts toward positive transformation. CTA must naturally include: comment a keyword, share with someone relevant, DM for info. Keep spoken line short. Strong visual closure.`
+:sceneCount===6?`SCENE 1 — THE HOOK (0:00–0:05): Stop scrolling. Create immediate visual impact. Trigger curiosity. Introduce tension, surprise, contradiction, fear, desire, or information gap. Visual prompt in English: describe subject, environment, camera framing, lighting, movement, vertical 9:16 composition, matching selected style. Malay dialogue: natural Malaysian, short, spoken, curiosity-driven, avoid unnecessary explanation. Editing: fast opening impact, pattern interrupt, kinetic text, sound hit, relevant custom motion graphic.
 
-EDITING & VFX: Topic-specific per scene from: smash cut, whip pan, speed ramp, match cut, paper tear, glitch transition, kinetic typography, counter animation, HUD overlay, motion tracking, parallax, camera shake, light sweep, particle reveal, freeze frame, punch-in zoom, rack focus, sound-synced cuts. NEVER random — every effect must support attention, comprehension, emotion, or narrative progression.
+SCENE 2 — THE AGITATION (0:05–0:10): Reveal the main problem. Show the audience’s pain point. Make the issue personally relevant. Answer "Kenapa benda ni masalah untuk aku?" Use relatable consequences, fast visual storytelling, short Malay dialogue, topic-specific overlays.
+
+SCENE 3 — DEEPENING THE PROBLEM (0:10–0:15): Escalate consequences. Increase emotional stakes. Show what happens if nothing changes. Possible triggers: fear of loss, missed opportunity, financial pressure, time pressure, family concern, social proof, future regret, competitive disadvantage. Do NOT merely repeat Scene 2. Scene 3 must INTENSIFY the narrative.
+
+SCENE 4 — THE SOLUTION (0:15–0:20): Reveal the product/method/service/mechanism. Introduce the practical answer. The transition should feel like a clear turning point. Visually communicate "Ini cara masalah tadi boleh diselesaikan." Avoid unsupported guarantees, fabricated proof, invented statistics. If factual information is uncertain, phrase it carefully.
+
+SCENE 5 — EXTRA BENEFIT (0:20–0:25): Add a bonus benefit. Show emotional reward. Visualize transformation. Increase desire. Possible rewards: relief, confidence, security, freedom, convenience, status, time saved, family peace, business growth, better control. Visual tone should shift toward positive transformation.
+
+SCENE 6 — CTA (0:25–0:30): Drive immediate action. CTA must naturally include: Comment CTA, Share CTA, DM CTA. Example behavioral structure: comment a keyword, share with someone relevant, DM for more information. Keep it natural. Do not make the spoken line excessively long. Use strong visual closure.`
+:`- Spread the narrative across ${sceneCount} scenes: hook→problem escalation→solution reveal→benefits→CTA. Distribute emotional arc evenly. Each scene ${perScene}s.`}
+
+VISUAL PROMPT ENGINEERING RULES:
+- Every Visual Prompt must be in English, production-ready
+- Describe: Main subject, Environment, Action, Camera shot, Camera movement, Lighting, Color palette, Mood, Selected visual style, Vertical 9:16 framing, Relevant motion graphics, Realistic commercial quality
+- Preferred vocabulary when relevant: cinematic commercial photography, realistic human movement, premium advertising lighting, dynamic camera push-in, handheld urgency, shallow depth of field, volumetric lighting, high contrast, clean subject separation, vertical 9:16 composition, mobile-first framing, realistic textures, commercial campaign quality
+- Do not overload every prompt with meaningless adjectives
+- Maintain continuity across all scenes: same subject, same world, progressive story
+
+MALAY DIALOGUE RULES:
+- Use Bahasa Melayu Malaysia: natural spoken rhythm, TikTok-friendly phrasing, short sentences, high-retention wording, familiar Malaysian vocabulary
+- Speakable within approximately ${perScene} seconds
+- AVOID: Indonesian phrasing, stiff corporate language, academic essays, long explanations, unnatural direct translations from English
+
+EDITING & VFX RULES:
+- Every scene must contain topic-specific editing instructions
+- Possible techniques: smash cut, whip pan, speed ramp, match cut, paper tear, glitch transition, kinetic typography, counter animation, HUD overlay, motion tracking, parallax, camera shake, light sweep, particle reveal, freeze frame, punch-in zoom, rack focus, sound-synced cuts
+- Do NOT use effects randomly. Every effect must support: Attention, Comprehension, Emotion, Narrative progression
+
+QUALITY CONTROL — before responding, silently verify:
+- Exactly one visual style selected
+- Exactly 3 custom motion graphics
+- Exactly ${sceneCount} scenes × ${perScene}s each = ${totalSec}s total
+- Every scene has English visual prompt, camera, action, emotion, Malay dialogue, Editing & VFX
+- ${sceneCount===3?'Scene 1=Hook+Agitate, Scene 2=Deepen+Solution, Scene 3=Benefit+CTA':sceneCount===6?'Scene 1=Hook, 2=Agitate, 3=Deepen, 4=Solution, 5=Benefit, 6=CTA':'Narrative arc distributed evenly'}
+- Malay sounds Malaysian (not Indonesian)
+- Visual continuity maintained
+- No invented statistics, no unsupported guarantees
+- If any condition fails, correct before output
+
+RESPONSE PRIORITY: Follow safety → Follow user constraints → Preserve factual accuracy → Maintain exact ${sceneCount}-scene architecture → Optimize retention → Maintain visual continuity → Keep dialogue natural → Make prompts production-ready.
+
+DEFAULT BEHAVIOR: When user gives only a short topic (e.g. "AI untuk bisnes"), do not ask questions. Infer a compelling angle and generate the complete blueprint immediately. Product → pain→solution→benefit→CTA. Fact → surprise→consequence→explanation→action. Service → friction→cost→solution→transformation. Story → hook→conflict→escalation→resolution. Awareness → hidden problem→consequence→practical response. Marketing → desire→objection→mechanism→conversion. Always adapt creatively rather than mechanically copying examples.
 
 OUTPUT FORMAT — Return ONLY valid JSON:
 {
   "gaya_visual_terpilih": "[Selected style name]",
   "analisis_strategik": {
-    "target_impak": "[Impact description BM]",
+    "target_impak": "[Concise BM — intended audience effect]",
     "custom_motion_graphics": ["Topic-specific Graphic 1","Graphic 2","Graphic 3"]
   },
   "tajuk_video": "[High-retention Malay title]",
@@ -1990,8 +2183,11 @@ OUTPUT FORMAT — Return ONLY valid JSON:
     {
       "scene_num":1,"timecode":"0:00–0:05",
       "visual_prompt":"[Production-ready English visual — subject, environment, action, camera shot+movement, lighting, color palette, mood, 9:16 vertical, matching selected style]",
+      "camera":"[Camera shot + movement — e.g. Extreme Push In, Handheld Shake, Hero Push In, Parallax Move, Low Angle Hero Shot]",
+      "action":"[What physically happens in the scene — specific movements, transitions, UI animations]",
+      "emotion":"[Emotional tone in BM — e.g. TERUJA, FRUST, SEDIH, YAKIN, BEBAS]",
       "dialog":"[Natural Malaysian Malay — short, spoken, curiosity-driven]",
-      "editing_vfx":"[Topic-specific editing — technique + purpose]"
+      "editing_vfx":"[Topic-specific editing — technique + purpose: attention/comprehension/emotion/narrative]"
     }
   ]
 }`;
@@ -2018,10 +2214,17 @@ OUTPUT FORMAT — Return ONLY valid JSON:
   }
   
   data.scenes.forEach(s=>{
-    const labels={1:'🎣 HOOK',2:'😰 AGITATE',3:'📈 DEEPEN',4:'💡 SOLUTION',5:'🎁 BENEFIT',6:'📢 CTA'};
+    const sc=s.scene_num;
+    const total=sceneCount;
+    const labels3={1:'🎣 HOOK+AGITATE',2:'💡 DEEPEN+SOLVE',3:'🎁 BENEFIT+CTA'};
+    const labels6={1:'🎣 HOOK',2:'😰 AGITATE',3:'📈 DEEPEN',4:'💡 SOLUTION',5:'🎁 BENEFIT',6:'📢 CTA'};
+    const labelMap=total===3?labels3:labels6;
     html+=`<div class="scene-card">
-      <div class="sc-header"><span class="sc-num">${labels[s.scene_num]||'Scene '+s.scene_num}</span><span class="sc-time">${escapeHtml(s.timecode||'')}</span></div>
+      <div class="sc-header"><span class="sc-num">${labelMap[sc]||'Scene '+sc}</span><span class="sc-time">${escapeHtml(s.timecode||'')}</span></div>
       <p style="font-size:0.8rem;color:var(--text2);margin:0.3rem 0">👁️ ${escapeHtml(s.visual_prompt||'')}</p>
+      ${s.camera?`<span class="sc-camera">📷 ${escapeHtml(s.camera)}</span>`:''}
+      ${s.action?`<span class="sc-action">🎬 ${escapeHtml(s.action)}</span>`:''}
+      ${s.emotion?`<span style="font-size:0.72rem;color:var(--purple);display:block;margin-top:0.3rem">💭 ${escapeHtml(s.emotion)}</span>`:''}
       ${s.dialog?`<div class="sc-dialogue">💬 "${escapeHtml(s.dialog)}"</div>`:''}
       ${s.editing_vfx?`<span class="sc-action">✂️ ${escapeHtml(s.editing_vfx)}</span>`:''}
     </div>`;
@@ -2090,10 +2293,25 @@ async function generateCharacterSheet(name,refImages){
   const sheetPrompt=buildSheetPrompt(subjectType,name||'Subject');
   
   try{
+    _lastCompositePrompt = sheetPrompt; // Store for copy button
     const imageUrl=await callGeminiImage(sheetPrompt, refImages);
     removeTyping();
     addAIMsg(`<h4>📋 Character Sheet — ${escapeHtml(name||'Subject')}</h4><p style="color:var(--text2);font-size:0.8rem">${typeInfo.icon} ${typeInfo.label} · Professional Production Reference</p><p><img src="${imageUrl}" alt="Character Sheet" style="max-width:100%;border-radius:12px;cursor:pointer" onclick="openLightbox('${imageUrl}')"></p>`);
     generatedImages=[imageUrl];
+    
+    const dlBtn=document.createElement('div');
+    dlBtn.className='msg ai';
+    dlBtn.innerHTML=`<div class="avatar">🤖</div><div class="bubble">
+      <p style="margin-bottom:0.75rem">✅ Character sheet generated!</p>
+      <div class="choice-row">
+        <button class="choice-btn primary" onclick="openLightbox('${imageUrl}')" style="font-size:0.8rem">🔍 Preview</button>
+        <button class="choice-btn primary" onclick="downloadStoryboardComposite()" style="font-size:0.8rem">⬇️ Download</button>
+        <button class="choice-btn" onclick="copyLastPrompt()" style="font-size:0.8rem">📋 Copy Prompt</button>
+        <button class="choice-btn" onclick="startCharacterSheet()" style="font-size:0.8rem">🔄 Regenerate</button>
+      </div>
+    </div>`;
+    document.getElementById('chatArea').appendChild(dlBtn);
+    document.getElementById('chatArea').scrollTop=document.getElementById('chatArea').scrollHeight;
   }catch(e){
     removeTyping();
     addAIMsg(`<p style="color:var(--red)">❌ Image generation failed: ${escapeHtml(e.message)}</p>`);
@@ -2263,80 +2481,276 @@ async function generateVideoPromptAfterEdit(){
   await generateVideoPromptAfterApproval(currentMode);
 }
 
+// ═══════════════════ GRAFIX COMPOSITE SHEET ═══════════════════
+async function generateGrafixCompositeSheet(){
+  addTyping('Generating grafix storyboard sheet...');
+  
+  try{
+    const data=JSON.parse(currentStoryboard);
+    if(!data.scenes||!Array.isArray(data.scenes)) throw new Error('Invalid grafix storyboard data');
+    
+    const scenes=data.scenes;
+    const style=data.gaya_visual_terpilih||'Cyber-Dashboard';
+    const title=data.tajuk_video||'Grafix Storyboard';
+    const durasi=data.durasi||'30 Saat';
+    const motionGFX=data.analisis_strategik?.custom_motion_graphics||['Motion Graphic 1','Motion Graphic 2','Motion Graphic 3'];
+    const targetImpak=data.analisis_strategik?.target_impak||'High-impact visual storytelling';
+    const audience=window._lastAudience||'Umum';
+    
+    // Build scene rows for the table
+    const sceneRows=scenes.map((s,i)=>{
+      const sc=s.scene_num||i+1;
+      const tc=s.timecode||'';
+      const vis=s.visual_prompt||'';
+      const cam=s.camera||'Medium Shot';
+      const act=s.action||'';
+      const emo=s.emotion||'';
+      const dial=s.dialog||'';
+      return `ROW ${sc}: Time=${tc} | Visual=${vis} | Camera=${cam} | Action=${act} | Emotion=${emo} | Dialogue="${dial}"`;
+    }).join('\n');
+    
+    const compositePrompt=`PROFESSIONAL GRAFIX STORYBOARD DOCUMENT — ${style} style. Generate a SINGLE composite image matching this EXACT layout.
+
+📐 CANVAS: 9:16 portrait (vertical). ${style} aesthetic — dark futuristic background, neon cyan/purple accents, glassmorphism UI elements.
+
+═══════════════════════════════════════
+HEADER SECTION (top):
+═══════════════════════════════════════
+Dark gradient background with neon accents matching ${style} style.
+- VIDEO TITLE: "${title}" in large bold cyan/white text
+- METADATA row: Duration: ${durasi} | Style: ${style} | Target Audience: ${audience} | Audio: Energetic background music
+
+═══════════════════════════════════════
+CUSTOM MOTION GRAPHICS SECTION:
+═══════════════════════════════════════
+3 custom motion graphic visual cards with labels:
+1. ${motionGFX[0]||'Motion Graphic 1'} — visual graphic representation
+2. ${motionGFX[1]||'Motion Graphic 2'} — visual graphic representation  
+3. ${motionGFX[2]||'Motion Graphic 3'} — visual graphic representation
++ Product/subject hero shot on the right side
+
+═══════════════════════════════════════
+MAIN STORYBOARD TABLE (${scenes.length} rows):
+═══════════════════════════════════════
+Professional storyboard table with columns: # | SCENE & DURATION | VISUAL | CAMERA | ACTION | EMOTION | DIALOGUE
+Each row is one scene. Dark-themed table with neon accent borders, readable text.
+
+${sceneRows}
+
+Table design: Dark background cells, neon cyan/purple borders between rows, white/light text, scene numbers highlighted. Professional infographic table style.
+
+═══════════════════════════════════════
+FOOTER SECTION (bottom):
+═══════════════════════════════════════
+Dark gradient matching header.
+- TOTAL DURATION: ${durasi}
+- FORMAT: VERTICAL (9:16)
+- STYLE USED: ${style}
+
+═══════════════════════════════════════
+QUALITY REQUIREMENTS:
+═══════════════════════════════════════
+- ALL text MUST be legible — white/cyan text on dark background
+- Professional advertising agency storyboard presentation quality
+- ${style} aesthetic throughout — consistent neon/cyber visual language
+- Table rows clearly separated with visible borders/highlights
+- 9:16 portrait — ONE SINGLE IMAGE containing the entire document
+- NO watermarks, NO disconnected elements
+- Visual continuity maintained across all scenes`;
+
+    // Use best model for composite (Pro has best text rendering)
+    const savedModels=[...availableImageModels];
+    if(availableImageModels.includes('gemini-3-pro-image')){
+      availableImageModels=['gemini-3-pro-image',...availableImageModels.filter(m=>m!=='gemini-3-pro-image')];
+    }
+    
+    const userRefs = (window._lastRefImages && window._lastRefImages.length > 0) ? window._lastRefImages : null;
+    _lastCompositePrompt = compositePrompt;
+    const imageUrl=await callGeminiImage(compositePrompt, userRefs);
+    availableImageModels=savedModels;
+    
+    generatedImages=[imageUrl];
+    
+    removeTyping();
+    addAIMsg(`<h4>🖼️ ${escapeHtml(title)}</h4>
+      <p style="color:var(--text2);font-size:0.8rem">⏱️ ${escapeHtml(durasi)} · 🎨 ${escapeHtml(style)} · 📐 9:16 Vertical · ${scenes.length} Scenes</p>
+      <p style="margin-top:0.5rem"><img src="${imageUrl}" alt="Grafix Storyboard" style="max-width:100%;border-radius:12px;cursor:pointer;box-shadow:0 8px 32px rgba(0,0,0,0.4)" onclick="openLightbox('${imageUrl}')"></p>`);
+    
+    const dlBtn=document.createElement('div');
+    dlBtn.className='msg ai';
+    dlBtn.innerHTML=`<div class="avatar">🤖</div><div class="bubble">
+      <p style="margin-bottom:0.75rem">✅ Grafix storyboard sheet generated — ${scenes.length} scenes, ${style} style!</p>
+      <div class="choice-row">
+        <button class="choice-btn primary" onclick="openLightbox('${imageUrl}')" style="font-size:0.8rem">🔍 Preview</button>
+        <button class="choice-btn primary" onclick="downloadStoryboardComposite()" style="font-size:0.8rem">⬇️ Download</button>
+        <button class="choice-btn" onclick="copyLastPrompt()" style="font-size:0.8rem">📋 Copy Prompt</button>
+        <button class="choice-btn" onclick="generateGrafixCompositeSheet()" style="font-size:0.8rem">🔄 Regenerate</button>
+      </div>
+    </div>`;
+    document.getElementById('chatArea').appendChild(dlBtn);
+    document.getElementById('chatArea').scrollTop=document.getElementById('chatArea').scrollHeight;
+    
+  }catch(e){
+    removeTyping();
+    addAIMsg(`<p style="color:var(--red)">❌ Error: ${escapeHtml(e.message)}</p>`);
+    console.error('Grafix composite error:',e);
+  }
+}
+
 async function generateStoryboardImageAfterApproval(){
-  addTyping('Generating storyboard images...');
+  // Route Grafix mode to its own composite format
+  if(currentMode==='grafix'){ await generateGrafixCompositeSheet(); return; }
+  
+  addTyping('Generating composite storyboard sheet...');
   
   try{
     const data=JSON.parse(currentStoryboard);
     if(!data.scenes||!Array.isArray(data.scenes)) throw new Error('Invalid storyboard data');
     
     const scenes=data.scenes;
-    generatedImages=[];
-    
-    // Generate images for each scene (limit to 6 max for quota)
-    const maxScenes=Math.min(scenes.length,6);
-    
-    let html='<h4>🖼️ Storyboard Visuals</h4><div class="img-grid">';
-    
-    // Style + continuity anchors from the approved storyboard
-    const styleAnchor = data.suggested_style || data.gaya_visual_terpilih || data.style || 'Cinematic Commercial';
-    const charAnchor = data.character_anchor || data.character || data.main_object || '';
-    
-    for(let i=0;i<maxScenes;i++){
-      const s=scenes[i];
-      const imgPrompt=`PHOTOREALISTIC storyboard frame — Scene ${s.scene_num} of ${scenes.length}. Vertical 9:16 composition, mobile-first framing.
-
-VISUAL STYLE: ${styleAnchor}. Cinematic commercial photography, premium advertising lighting, shallow depth of field, high contrast, clean subject separation, realistic textures, commercial campaign quality.
-${charAnchor?`
-CONTINUITY ANCHOR (MUST match exactly in every scene): ${charAnchor}
-Same face, same clothing, same hairstyle, same product design, same branding, same environment logic as all other scenes.
-`:''}
-SCENE VISUAL: ${s.visual||s.visual_prompt||s.action||''}
-CAMERA: ${s.camera||s.camera_angle||'Medium shot'}
-ACTION: ${s.action||''}
-MOOD/EMOTION: ${s.emotion||(s.dialogue&&s.dialogue!=='—'?s.dialogue:'')||'engaging'}
-
-QUALITY: Ultra-detailed, sharp focus, 8K quality, professional composition, suitable for client presentation.
-NEGATIVE: NO text, NO words, NO letters, NO captions, NO watermarks, NO extra fingers, NO malformed hands, NO logo distortion, NO random people or products not described — visual ONLY.`;
-      
-      try{
-        // Panel 1: user-uploaded refs. Panels 2+: user refs + Panel 1 image for max continuity
-        let refImg = null;
-        const userRefs = (window._lastRefImages && window._lastRefImages.length > 0) ? window._lastRefImages : [];
-        if(i === 0){
-          refImg = userRefs.length ? userRefs : null;
-        } else if(generatedImages.length > 0){
-          const extracted = extractBase64FromDataUrl(generatedImages[0]);
-          refImg = extracted ? [...userRefs, extracted] : (userRefs.length ? userRefs : null);
-        } else if(userRefs.length){
-          refImg = userRefs;
-        }
-        const imageUrl=await callGeminiImage(imgPrompt,refImg);
-        generatedImages.push(imageUrl);
-        html+=`<img src="${imageUrl}" alt="Scene ${s.scene_num}" onclick="openLightbox('${imageUrl}')" style="animation:scaleIn 0.4s ease ${i*0.1}s both">`;
-      }catch(e){
-        console.error(`Scene ${i+1} image failed:`,e);
-        html+=`<div style="padding:1rem;text-align:center;color:var(--red);font-size:0.7rem;border:1px dashed var(--red);border-radius:10px">❌ Scene ${i+1}</div>`;
-      }
+    // Use actual scenes — no blank padding. Grid adapts to count.
+    let gridScenes=[...scenes];
+    gridScenes=gridScenes.slice(0, Math.min(gridScenes.length, 6));
+    // For 5+ scenes, pick best 4 representative scenes
+    if(gridScenes.length>4){
+      const idx=[0, Math.floor(gridScenes.length*0.3), Math.floor(gridScenes.length*0.7), gridScenes.length-1];
+      gridScenes=idx.map(i=>gridScenes[Math.min(i,gridScenes.length-1)]);
     }
     
-    html+='</div>';
+    const panelCount=gridScenes.length;
+    const gridLayout=panelCount===1?'1 full-width panel'
+      :panelCount===2?'2 panels side-by-side (1 row × 2 columns)'
+      :panelCount===3?'3 panels: top row 2 panels, bottom row 1 centered wider panel spanning both columns'
+      :'2 columns × 2 rows (4 panels)';
+    
+    // Extract storyboard metadata
+    const title=data.title||'Storyboard';
+    const duration=data.duration||'10 saat';
+    const styleLabel=data.suggested_style||data.gaya_visual_terpilih||data.style||'Cinematic';
+    const audienceLabel=data.audience||(window._lastAudience||'Umum');
+    const audioLabel=data.audio_suggestion||'Emotional background music, ambient sound';
+    const modeLabel=currentMode==='cinematic'?'Cinematic':currentMode==='talkinghead'?'Talking Head':currentMode==='grafix'?'Motion Graphics':'Storyboard';
+    
+    // Build scene descriptions for the prompt
+    const sceneDescs=gridScenes.map((s,i)=>{
+      const num=i+1;
+      const tc=s.timecode||`${((num-1)*2.5).toFixed(1)}s–${(num*2.5).toFixed(1)}s`;
+      const vis=s.visual||s.visual_prompt||s.action||'';
+      const cam=s.camera||s.camera_angle||'Medium Shot';
+      const act=s.action||'';
+      const emo=s.emotion||'';
+      const dial=s.dialogue||'—';
+      return `PANEL ${num} (${tc}):
+- VISUAL: ${vis}
+- CAMERA: ${cam}
+- ACTION: ${act}
+- EMOTION: ${emo}
+- DIALOGUE: "${dial}"`;
+    }).join('\n\n');
+    
+    const styleAnchor=data.suggested_style||data.gaya_visual_terpilih||data.style||'Cinematic Commercial';
+    const charAnchor=data.character_anchor||data.character||data.main_object||'';
+    
+    const compositePrompt=`PROFESSIONAL STORYBOARD DOCUMENT — cinematic advertising-agency presentation board. Generate a SINGLE composite image matching this EXACT layout.
+
+📐 CANVAS: 9:16 portrait (vertical), clean white background (#FFFFFF).
+
+═══════════════════════════════════════
+HEADER BANNER (top of document):
+═══════════════════════════════════════
+Dark navy blue (#1a2744) horizontal banner across the full width. Inside:
+- Top row: film clapperboard icon 🎬 followed by "STORYBOARD:" in white, then the title "${title.replace(/^[^:]+:\s*/,'')}" in BOLD LIGHT BLUE (#68b0f8), large font
+- Bottom row (4 metadata items arranged left-to-right, white text, small font):
+  • Clock icon ⏱️ "DURATION: ${duration}" 
+  • Briefcase icon 💼 "STYLE: ${styleLabel}"
+  • People icon 👥 "AUDIENCE: ${audienceLabel}"
+  • Music icon 🎵 "AUDIO SUGGESTION: ${audioLabel}"
+
+═══════════════════════════════════════
+MAIN GRID — ${gridLayout} of storyboard panels:
+═══════════════════════════════════════
+Each panel (white background, thin light gray border) is split vertically:
+  LEFT HALF (~50% width): A photorealistic cinematic still frame (vertical 9:16 crop) showing the scene. Characters/products MUST match the reference images 100%. Style: ${styleAnchor}. Premium advertising lighting, cinematic composition, shallow depth of field.
+  RIGHT HALF (~50% width): White text block with these labeled sections in small black text (bold labels in dark blue #1a3a5c):
+    VISUAL: [scene description — English, production-ready]
+    CAMERA: [shot type + movement]
+    ACTION: [what happens in the scene]
+    EMOTION: [emotional tone]
+    DIALOGUE: "[Natural BM dialogue in quotes — italic style]"
+  TOP-LEFT CORNER of each panel: A small BLUE (#3b82f6) square with white number (1-${panelCount}), next to it the timecode in small text.
+
+SCENE DETAILS:
+${sceneDescs}
+
+${charAnchor?`⚡ CONTINUITY ANCHOR (EVERY PANEL — same identity):
+${charAnchor}
+Same face, same clothing, same hairstyle, same product design, same branding in ALL 4 panels.`:''}
+
+═══════════════════════════════════════
+FOOTER BANNER (bottom of document):
+═══════════════════════════════════════
+Dark navy blue (#1a2744) horizontal banner. 3 items centered left-to-right in white text:
+  • Clock icon "TOTAL DURATION: ${duration}"
+  • Phone icon 📱 "FORMAT: VERTICAL 9:16"  
+  • Clapperboard icon 🎬 "STYLE: ${styleLabel}"
+
+═══════════════════════════════════════
+QUALITY REQUIREMENTS:
+═══════════════════════════════════════
+- ALL text MUST be legible, clear, properly rendered — use dark blue/black text on white
+- Professional studio-quality presentation board suitable for client delivery
+- Clean borders, balanced spacing, consistent typography
+- Photorealistic visuals, 8K quality, cinematic lighting
+- 9:16 portrait — ONE SINGLE IMAGE containing the entire storyboard document
+- NO watermarks, NO random extra text, NO disconnected elements
+- The ${panelCount} panel visuals must show CONTINUITY — same characters, same world, progressive story`;
+
+    // Use best model for composite (Nano Banana Pro has best text rendering)
+    const savedModels=[...availableImageModels];
+    if(availableImageModels.includes('gemini-3-pro-image')){
+      availableImageModels=['gemini-3-pro-image',...availableImageModels.filter(m=>m!=='gemini-3-pro-image')];
+    }
+    
+    const userRefs = (window._lastRefImages && window._lastRefImages.length > 0) ? window._lastRefImages : null;
+    _lastCompositePrompt = compositePrompt; // Store for copy button
+    const imageUrl=await callGeminiImage(compositePrompt, userRefs);
+    
+    // Restore original model order
+    availableImageModels=savedModels;
+    
+    generatedImages=[imageUrl];
+    currentCompositeData={title,duration,styleLabel,audienceLabel,audioLabel,scenes:gridScenes};
+    
     removeTyping();
-    addAIMsg(html);
+    const panelLabel=panelCount===1?'1 Panel':panelCount===2?'2 Panels':panelCount===3?'3 Panels (2+1)':'4 Panels (2×2)';
+    addAIMsg(`<h4>🖼️ ${escapeHtml(title)}</h4>
+      <p style="color:var(--text2);font-size:0.8rem">⏱️ ${escapeHtml(duration)} · 🎨 ${escapeHtml(styleLabel)} · 📐 9:16 Vertical · ${panelLabel}</p>
+      <p style="margin-top:0.5rem"><img src="${imageUrl}" alt="Storyboard Sheet" style="max-width:100%;border-radius:12px;cursor:pointer;box-shadow:0 8px 32px rgba(0,0,0,0.4)" onclick="openLightbox('${imageUrl}')"></p>`);
     
-    if(generatedImages.length>0){
-      const dlBtn=document.createElement('div');
-      dlBtn.className='msg ai';
-      dlBtn.innerHTML=`<div class="avatar">🤖</div><div class="bubble">
-        <p style="margin-bottom:0.5rem">✅ ${generatedImages.length} image generated!</p>
-        <button class="choice-btn primary" onclick="downloadStoryboardComposite()" style="font-size:0.8rem">⬇️ Download Composite</button>
-      </div>`;
-      document.getElementById('chatArea').appendChild(dlBtn);
-    }
+    const dlBtn=document.createElement('div');
+    dlBtn.className='msg ai';
+    dlBtn.innerHTML=`<div class="avatar">🤖</div><div class="bubble">
+      <p style="margin-bottom:0.75rem">✅ Composite storyboard sheet generated — ${panelLabel} dengan header & footer!</p>
+      <div class="choice-row">
+        <button class="choice-btn primary" onclick="openLightbox('${imageUrl}')" style="font-size:0.8rem">🔍 Preview</button>
+        <button class="choice-btn primary" onclick="downloadStoryboardComposite()" style="font-size:0.8rem">⬇️ Download</button>
+        <button class="choice-btn" onclick="copyLastPrompt()" style="font-size:0.8rem">📋 Copy Prompt</button>
+        <button class="choice-btn" onclick="regenerateStoryboardSheet()" style="font-size:0.8rem">🔄 Regenerate</button>
+      </div>
+    </div>`;
+    document.getElementById('chatArea').appendChild(dlBtn);
+    document.getElementById('chatArea').scrollTop=document.getElementById('chatArea').scrollHeight;
+    
   }catch(e){
     removeTyping();
-    addAIMsg(`<p style="color:var(--red)">❌ Error generating images: ${escapeHtml(e.message)}</p>`);
+    addAIMsg(`<p style="color:var(--red)">❌ Error generating composite: ${escapeHtml(e.message)}</p>`);
+    console.error('Composite generation error:',e);
   }
+}
+
+async function regenerateStoryboardSheet(){
+  addTyping('Regenerating storyboard sheet...');
+  try{ await generateStoryboardImageAfterApproval(); } catch(e){ removeTyping(); addAIMsg(`<p style="color:var(--red)">❌ ${escapeHtml(e.message)}</p>`); }
 }
 
 async function generateStoryboardImageAfterEdit(){
@@ -2375,6 +2789,7 @@ CRITICAL: ONE SINGLE IMAGE — a complete professional storyboard reference shee
 NEGATIVE: No random text, no watermarks, no disconnected scenes, no product redesign between panels.`;
 
     const smRefs = (window._lastRefImages && window._lastRefImages.length>0) ? window._lastRefImages : null;
+    _lastCompositePrompt = sheetPrompt; // Store for copy button
     const imageUrl=await callGeminiImage(sheetPrompt, smRefs);
     generatedImages=[imageUrl];
     
@@ -2384,7 +2799,13 @@ NEGATIVE: No random text, no watermarks, no disconnected scenes, no product rede
     const dlBtn=document.createElement('div');
     dlBtn.className='msg ai';
     dlBtn.innerHTML=`<div class="avatar">🤖</div><div class="bubble">
-      <button class="choice-btn primary" onclick="downloadStoryboardComposite()" style="font-size:0.8rem">⬇️ Download Storyboard</button>
+      <p style="margin-bottom:0.75rem">✅ Stop motion storyboard sheet generated!</p>
+      <div class="choice-row">
+        <button class="choice-btn primary" onclick="openLightbox('${imageUrl}')" style="font-size:0.8rem">🔍 Preview</button>
+        <button class="choice-btn primary" onclick="downloadStoryboardComposite()" style="font-size:0.8rem">⬇️ Download</button>
+        <button class="choice-btn" onclick="copyLastPrompt()" style="font-size:0.8rem">📋 Copy Prompt</button>
+        <button class="choice-btn" onclick="regenerateStopMotion()" style="font-size:0.8rem">🔄 Regenerate</button>
+      </div>
     </div>`;
     document.getElementById('chatArea').appendChild(dlBtn);
     document.getElementById('chatArea').scrollTop=document.getElementById('chatArea').scrollHeight;
@@ -2394,6 +2815,11 @@ NEGATIVE: No random text, no watermarks, no disconnected scenes, no product rede
   }
 }
 
+async function regenerateStopMotion(){
+  addTyping('Regenerating stop motion sheet...');
+  try{ await generateStopMotionImages(); } catch(e){ removeTyping(); addAIMsg(`<p style="color:var(--red)">❌ ${escapeHtml(e.message)}</p>`); }
+}
+
 // ═══════════════════ COMPOSITE DOWNLOAD ═══════════════════
 function downloadStoryboardComposite(){
   if(generatedImages.length===0){
@@ -2401,76 +2827,18 @@ function downloadStoryboardComposite(){
     return;
   }
   
-  const canvas=document.createElement('canvas');
-  const ctx=canvas.getContext('2d');
-  const perSize=400;
-  const cols=Math.min(generatedImages.length,3);
-  const rows=Math.ceil(generatedImages.length/cols);
-  const headerH=80;
-  const footerH=60;
-  
-  canvas.width=perSize*cols;
-  canvas.height=headerH+(perSize*rows)+footerH;
-  
-  // Background
-  ctx.fillStyle='#0a0a20';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  
-  // Header
-  ctx.fillStyle='#f0a030';
-  ctx.font='bold 28px "Segoe UI",sans-serif';
-  ctx.textAlign='center';
-  ctx.fillText('Storyboard Master Pro',canvas.width/2,45);
-  
-  // Draw images
-  let loaded=0;
-  generatedImages.forEach((imgUrl,i)=>{
-    const img=new Image();
-    img.crossOrigin='anonymous';
-    img.onload=()=>{
-      const col=i%cols;
-      const row=Math.floor(i/cols);
-      const x=col*perSize;
-      const y=headerH+(row*perSize);
-      
-      // Border rect
-      ctx.strokeStyle='#282860';
-      ctx.lineWidth=2;
-      ctx.strokeRect(x+5,y+5,perSize-10,perSize-10);
-      
-      // Image
-      ctx.drawImage(img,x+10,y+10,perSize-20,perSize-55);
-      
-      // Scene label
-      ctx.fillStyle='#f0a030';
-      ctx.font='bold 14px "Segoe UI",sans-serif';
-      ctx.textAlign='center';
-      ctx.fillText(`Scene ${i+1}`,x+perSize/2,y+perSize-30);
-      
-      loaded++;
-      if(loaded===generatedImages.length){
-        // Footer
-        ctx.fillStyle='#9090c8';
-        ctx.font='12px "Segoe UI",sans-serif';
-        ctx.textAlign='center';
-        ctx.fillText('Generated by Storyboard Master Pro · Powered by Gemini AI',canvas.width/2,canvas.height-25);
-        
-        canvas.toBlob(blob=>{
-          const url=URL.createObjectURL(blob);
-          const a=document.createElement('a');
-          a.href=url;a.download='storyboard-composite.png';
-          a.click();
-          URL.revokeObjectURL(url);
-          showToast('✅ Downloaded!');
-        },'image/png');
-      }
-    };
-    img.src=imgUrl;
-  });
+  // Single composite sheet — download directly as PNG
+  const imgUrl=generatedImages[0];
+  const a=document.createElement('a');
+  a.href=imgUrl;
+  a.download='storyboard-composite.png';
+  a.click();
+  showToast('✅ Storyboard sheet downloaded!');
 }
 
 console.log('🎬 Storyboard Master Pro ready!');
-console.log('💡 Tips: Masukkan Gemini API key untuk unlock semua features.');
+console.log('🔄 Updated July 2026 — Gemini 3.5 Flash + Nano Banana Pro');
+console.log('📋 Composite storyboard sheets with header/footer — 2×2 grid matching professional format');
 console.log('🖼️ 5 Mode AI: Cinematic · Talking Head · Stop Motion · Grafix · Character Sheet');
 </script>
 </body>
