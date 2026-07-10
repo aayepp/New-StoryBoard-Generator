@@ -5896,16 +5896,21 @@ window.exportFlowAI = function(){
 // ═══════════════════════════════════════════════════════
 window._refAnchorCache = null;
 window._refAnchorCacheKey = null;
+let _refAnchorInProgress = false;
 
 const _origCallGeminiText = window.callGeminiText;
 window.callGeminiText = async function(prompt, images){
-  if (images && images.length && typeof window.enhanceReferenceImage === 'function') {
-    const key = images[0].slice(0,64) + '_' + images.length; // cheap fingerprint
+  if (!_refAnchorInProgress && images && images.length && typeof window.enhanceReferenceImage === 'function') {
+    const first = images[0];
+    const b64 = (typeof first === 'string') ? first : ((first && first.base64) || '');
+    const key = b64.slice(0,64) + '_' + images.length; // cheap fingerprint
     if (window._refAnchorCacheKey !== key) {
+      _refAnchorInProgress = true;
       try {
         window._refAnchorCache = await window.enhanceReferenceImage(images);
         window._refAnchorCacheKey = key;
       } catch(e) { /* non-fatal — continue without anchor */ }
+      finally { _refAnchorInProgress = false; }
     }
     if (window._refAnchorCache) {
       prompt = `⚓ REFERENCE ANCHOR (auto-extracted from uploaded image — match EXACTLY):\n${window._refAnchorCache}\n\n${prompt}`;
