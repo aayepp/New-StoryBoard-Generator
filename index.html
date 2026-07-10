@@ -5336,20 +5336,62 @@ console.log('📤 Export Pack | 💾 Projects | 🎤 VO/On-Cam | 🖼️ Ref Enh
 'use strict';
 
 // ═══════════════════════════════════════════════════════
-// API KEY BRIDGE — core engine stores the key in a plain
-// `let apiKey` (script-scope, not window.apiKey). The feature
-// pack checks `window.apiKey`, which was always undefined even
-// after verifying — causing "masukkan API key dulu" errors on
-// Micro-Impact/Narrative Arc/A-B Compare/Script→Storyboard even
-// when the key IS verified. This makes window.apiKey a live
-// mirror of the real variable, no other files touched.
+// SHARED STATE BRIDGE — the core engine (script 1) keeps its state
+// in plain `let` variables (apiKey, currentStoryboard, currentMode,
+// workflowStep, currentVideoPrompt, generatedImages, currentAspect,
+// isGenerating, currentCompositeData) — script-scoped, NOT window.X.
+// The feature pack (script 2) and this glue script (script 3) both
+// read/write these as `window.X`, which — without this bridge — are
+// SEPARATE variables that only coincidentally share a name. That
+// mismatch is exactly what caused "masukkan API key dulu" on
+// verified keys, and "Cannot read properties of null (reading
+// 'scenes')" after A/B Compare / Micro-Impact / Narrative Arc /
+// Script→Storyboard (their `window.currentStoryboard` write never
+// reached the bare `currentStoryboard` the image generator reads).
+// Each property below is a live two-way mirror: writing window.X
+// updates the real variable, reading window.X returns its current
+// value — so both "namespaces" are permanently the same variable.
 // ═══════════════════════════════════════════════════════
-try {
-  Object.defineProperty(window, 'apiKey', {
-    get(){ try { return apiKey; } catch(e){ return undefined; } },
-    configurable: true
-  });
-} catch(e) { /* if apiKey isn't in scope for some reason, fail silently */ }
+[
+  'apiKey','isGenerating','currentMode','workflowStep','currentStoryboard',
+  'currentVideoPrompt','generatedImages','currentAspect','currentCompositeData'
+].forEach(function(name){
+  try {
+    Object.defineProperty(window, name, {
+      get(){
+        try {
+          switch(name){
+            case 'apiKey': return apiKey;
+            case 'isGenerating': return isGenerating;
+            case 'currentMode': return currentMode;
+            case 'workflowStep': return workflowStep;
+            case 'currentStoryboard': return currentStoryboard;
+            case 'currentVideoPrompt': return currentVideoPrompt;
+            case 'generatedImages': return generatedImages;
+            case 'currentAspect': return currentAspect;
+            case 'currentCompositeData': return currentCompositeData;
+          }
+        } catch(e){ return undefined; }
+      },
+      set(v){
+        try {
+          switch(name){
+            case 'apiKey': apiKey = v; break;
+            case 'isGenerating': isGenerating = v; break;
+            case 'currentMode': currentMode = v; break;
+            case 'workflowStep': workflowStep = v; break;
+            case 'currentStoryboard': currentStoryboard = v; break;
+            case 'currentVideoPrompt': currentVideoPrompt = v; break;
+            case 'generatedImages': generatedImages = v; break;
+            case 'currentAspect': currentAspect = v; break;
+            case 'currentCompositeData': currentCompositeData = v; break;
+          }
+        } catch(e){ /* core var not in scope — ignore */ }
+      },
+      configurable: true
+    });
+  } catch(e) { /* defineProperty failed — leave as plain window prop */ }
+});
 
 // ═══════════════════════════════════════════════════════
 // STICKY HEADER HEIGHT SYNC — fixes overlap between .nav and
