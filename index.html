@@ -2787,7 +2787,9 @@ VISUAL RULES: Every scene MUST include Visual description (English, production-r
 
 CHARACTER & PRODUCT CONSISTENCY: Same face, age, clothing, hairstyle, accessories across ALL scenes. If product involved: same packaging, logo, typography, colors, proportions, branding across all scenes. Include a consistent character/product anchor description that repeats in every scene's visual.
 
-QUALITY CHECK (silent, before output): Scene 1 stops attention. Every scene connects and progresses. Movement exists. Camera framing varies. Dialogue natural and fits timing. Characters/products consistent. Emotion progresses. Curiosity exists. Ending earned. CTA matches objective. No filler. If any check fails: revise before output.
+FINAL SCENE RULE (MANDATORY): The LAST scene must land as a HERO SHOT — a clean, confident, well-composed final visual of the main subject/product/brand (centered or intentionally framed, strong lighting, minimal distraction, premium finish) that pays off everything before it, combined with a natural CTA woven directly into the action or dialogue (comment a keyword, share with someone, tap the link, DM for info, visit — whichever matches the inferred objective). This must read as the story's earned conclusion, never as a bolted-on advertisement or generic outro.
+
+QUALITY CHECK (silent, before output): Scene 1 stops attention. Every scene connects and progresses. Movement exists. Camera framing varies. Dialogue natural and fits timing. Characters/products consistent. Emotion progresses. Curiosity exists. Ending earned. Final scene reads as a genuine hero shot. CTA present and matches objective. No filler. If any check fails: revise before output.
 
 OUTPUT FORMAT — Return ONLY valid JSON:
 {
@@ -2910,7 +2912,7 @@ PRODUCT CONSISTENCY (if product provided): original packaging, logo, typography,
 RETENTION LOGIC:
 - Opening: curiosity, surprise, relatable pain point, unexpected observation, emotional tension, unfinished information loop
 - Middle: reveal information progressively, don't give all answers immediately, introduce specific details, keep conversational momentum
-- Final: deliver payoff, resolve the main curiosity, natural conclusion, soft engagement cue only when appropriate. Do NOT force aggressive CTA.
+- Final scene (MANDATORY): resolve the main curiosity and land on a confident, warm closing frame — full attention on camera, natural expression, no trailing off mid-thought. End with a soft, conversational engagement cue that fits the tone (e.g. \"follow untuk part 2\", \"comment kalau kau rasa macam ni jugak\", \"share dengan member yang perlu dengar ni\") — natural like a real creator signing off, never a hard-sell CTA or corporate tagline.
 
 QUALITY VALIDATION (silent, before output): correct scene count, every dialogue exactly 2 sentences and 15-20 words, dialogue sounds naturally spoken, story progresses scene by scene, no consecutive camera repeats, character consistent, strong opening hook, middle keeps curiosity, ending has payoff. If any check fails: rewrite that scene before responding.
 
@@ -3008,7 +3010,7 @@ BAD: \"Beans roll, cup jumps, milk pours, logo spins, camera zooms, text explode
 
 SCENE 1 ENGAGEMENT RULE: Immediate visual curiosity — object suddenly slides into frame, ingredients jump into position, packaging snaps open, empty space rapidly assembles, product drops in, object spins to camera, props converge to center, surprising transformation begins. NO slow introductions — movement must be visible within the first second.
 
-HERO SHOT RULE: Scene ${sceneCount} MUST end with a strong presentation — main object centered or intentionally composed, clean background, props arranged neatly, strong lighting, brand-ready composition, minimal movement, premium finish. Examples: product centered while props settle around it, car stops at 3/4 hero angle, perfume bottle locks into center frame, house model completes and key slides beside it, coffee cup rotates to reveal final branding.
+HERO SHOT RULE: Scene ${sceneCount} MUST end with a strong presentation — main object centered or intentionally composed, clean background, props arranged neatly, strong lighting, brand-ready composition, minimal movement, premium finish, with clear negative space reserved for a CTA text overlay to be added in post (e.g. \\\"Shop Now\\\", \\\"Comment untuk info\\\"). Examples: product centered while props settle around it, car stops at 3/4 hero angle, perfume bottle locks into center frame, house model completes and key slides beside it, coffee cup rotates to reveal final branding.
 
 EASY-TO-ANIMATE RULE: Prefer frame-by-frame repositioning, simple masking, scale, rotation, practical tabletop stop motion, paper cutouts, miniature props, compositing. Prefer \"Three cards slide into a neat stack\" over \"A thousand particles simulate a tornado.\"
 
@@ -3134,7 +3136,7 @@ ${sceneCount===3?`SCENE 1 — HOOK+AGITATE (${perScene}s): Stop scrolling IMMEDI
 
 SCENE 2 — DEEPEN+SOLUTION (${perScene}s): Escalate consequences THEN reveal the fix. Transition from \"ini serious\" to \"tapi ada cara.\" Increase emotional stakes: fear of loss, missed opportunity, financial/time pressure, family concern, future regret. Then reveal product/method/service as clear turning point: \"Ini cara masalah tadi boleh diselesaikan.\" NO unsupported guarantees, NO fabricated proof, NO invented statistics. If factual information is uncertain, phrase it carefully.
 
-SCENE 3 — BENEFIT+CTA (${perScene}s): Emotional payoff + transformation + drive action. Show emotional reward: relief, confidence, security, freedom, family peace, growth. Visual tone shifts toward positive transformation. CTA must naturally include: comment a keyword, share with someone relevant, DM for info. Keep spoken line short. Strong visual closure.`
+SCENE 3 — BENEFIT+CTA (${perScene}s): Emotional payoff + transformation + drive action. Show emotional reward: relief, confidence, security, freedom, family peace, growth. Visual tone shifts toward positive transformation. This scene's visual is the HERO SHOT of the whole video — clean, confident, centered framing of the product/brand/subject, minimal clutter, strong lighting, premium finish. CTA must naturally include: comment a keyword, share with someone relevant, DM for info. Keep spoken line short. Strong visual closure.`
 :sceneCount===6?`SCENE 1 — THE HOOK (0:00–0:05): Stop scrolling. Create immediate visual impact. Trigger curiosity. Introduce tension, surprise, contradiction, fear, desire, or information gap. Visual prompt in English: describe subject, environment, camera framing, lighting, movement, vertical 9:16 composition, matching selected style. Malay dialogue: natural Malaysian, short, spoken, curiosity-driven, avoid unnecessary explanation. Editing: fast opening impact, pattern interrupt, kinetic text, sound hit, relevant custom motion graphic.
 
 SCENE 2 — THE AGITATION (0:05–0:10): Reveal the main problem. Show the audience's pain point. Make the issue personally relevant. Answer \"Kenapa benda ni masalah untuk aku?\" Use relatable consequences, fast visual storytelling, short Malay dialogue, topic-specific overlays.
@@ -3145,8 +3147,8 @@ SCENE 4 — THE SOLUTION (0:15–0:20): Reveal the product/method/service/mechan
 
 SCENE 5 — EXTRA BENEFIT (0:20–0:25): Add a bonus benefit. Show emotional reward. Visualize transformation. Increase desire. Possible rewards: relief, confidence, security, freedom, convenience, status, time saved, family peace, business growth, better control. Visual tone should shift toward positive transformation.
 
-SCENE 6 — CTA (0:25–0:30): Drive immediate action. CTA must naturally include: Comment CTA, Share CTA, DM CTA. Example behavioral structure: comment a keyword, share with someone relevant, DM for more information. Keep it natural. Do not make the spoken line excessively long. Use strong visual closure.`
-:`- Spread the narrative across ${sceneCount} scenes: hook→problem escalation→solution reveal→benefits→CTA. Distribute emotional arc evenly. Each scene ${perScene}s.`}
+SCENE 6 — CTA (0:25–0:30): Drive immediate action. This scene's visual is the HERO SHOT of the whole video — clean, confident, centered framing of the product/brand/subject, minimal clutter, strong lighting, premium finish, the natural conclusion of everything before it. CTA must naturally include: Comment CTA, Share CTA, DM CTA. Example behavioral structure: comment a keyword, share with someone relevant, DM for more information. Keep it natural. Do not make the spoken line excessively long. Use strong visual closure.`
+:`- Spread the narrative across ${sceneCount} scenes: hook→problem escalation→solution reveal→benefits→CTA. Distribute emotional arc evenly. Each scene ${perScene}s. The FINAL scene is MANDATORY the HERO SHOT — clean, confident, centered framing of the product/brand/subject as the story's earned conclusion — combined with a natural CTA.`}
 
 VISUAL PROMPT ENGINEERING RULES:
 - Every Visual Prompt must be in English, production-ready
@@ -4241,7 +4243,7 @@ CRITICAL RULES:
 - Every frame matters — ZERO filler, ZERO dead air
 - Scene 1 (HOOK): IMMEDIATE visual surprise — unfinished action, pattern interrupt, emotional tension. FORBIDDEN: "Hi guys", "Did you know", slow intros. First 0.5s MUST have movement.
 - Scene 2 (REVEAL): Quick escalation — show why this matters. Emotional consequence. Curiosity peak.
-- Scene 3 (PAYOFF): Resolution + natural CTA. Emotional closure. Brand anchor.
+- Scene 3 (PAYOFF): MANDATORY hero shot — clean, confident final visual of the product/subject/brand (centered, well-lit, premium finish) + natural CTA woven directly into the action/dialogue. Emotional closure. Brand anchor.
 - Dialogue: 5-8 words MAX per scene. Natural spoken BM. Punchy. Speakable in 3s.
 - Visual: ${aspect} vertical, photorealistic, cinematic commercial quality
 - Camera: Vary between scenes — Extreme Close Up, POV, Whip Pan, Low Angle
@@ -4362,7 +4364,7 @@ async function generateNarrativeArcStoryboard(topic, aspect, audience, refImages
 3. CONFLICT (10-15s): Introduce problem, tension, challenge. Personal stakes — "ini masalah aku".
 4. ESCALATION (15-20s): Emotional peak. Consequences intensify. Stakes at maximum.
 5. RESOLUTION (20-25s): Transformation, solution reveal, emotional shift toward positive.
-6. CTA+PAYOFF (25-30s): Emotional closure. Satisfaction. Natural action prompt. Brand anchor.
+6. CTA+PAYOFF (25-30s): MANDATORY hero shot — clean, confident final visual of the product/subject/brand (centered, well-lit, premium finish) that pays off the whole arc + natural CTA woven directly into the action/dialogue. Emotional closure. Satisfaction. Brand anchor.
 
 CRITICAL RULES:
 - 6 scenes × 5 seconds = 30 seconds total — NEVER change count
@@ -5559,6 +5561,7 @@ RULES:
 - If the script has [NAME]: dialogue tags, keep character names in the "dialogue" field as [NAME]: "line".
 - Visual field must be production-ready English (subject, environment, action, camera, lighting, mood, ${aspect} framing).
 - Camera: vary shot types across scenes — no consecutive repeats.
+- FINAL SCENE (default, unless the script clearly intends otherwise): close with a HERO SHOT — a clean, confident final visual of the main subject/product/brand — paired with a natural CTA beat that fits the story's tone. Only skip this if the user's script has an explicit, deliberate different ending (e.g. a cliffhanger, joke, or open question) — in that case preserve the script's real intent instead.
 
 RETURN ONLY valid JSON:
 {
